@@ -952,15 +952,17 @@ export default function MotherMoneyGame() {
             </div>;
           })}
         </div>
-        {town.buildings.map((b, i) => (
-          <div key={i} className="absolute flex items-center justify-center" style={{ left: b.x * TILE_SIZE, top: b.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
-            {BLDG_IMG[b.type] ? <Sprite src={BLDG_IMG[b.type]} size={TILE_SIZE} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
-          </div>
-        ))}
-        <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
+        {town.buildings.map((b, i) => {
+          const bSize = TILE_SIZE * 1.8;
+          const bOffset = (bSize - TILE_SIZE) / 2;
+          return <div key={i} className="absolute flex items-end justify-center" style={{ left: b.x * TILE_SIZE - bOffset, top: b.y * TILE_SIZE - (bSize - TILE_SIZE), width: bSize, height: bSize, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
+            {BLDG_IMG[b.type] ? <Sprite src={BLDG_IMG[b.type]} size={bSize} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
+          </div>;
+        })}
+        <div className="absolute flex items-end justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE - TILE_SIZE * 0.15, top: playerPos.y * TILE_SIZE - TILE_SIZE * 0.3, width: TILE_SIZE * 1.3, height: TILE_SIZE * 1.3, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
           {(() => {
             const src = vehicle ? VEHICLE_IMG[vehicle] : PLAYER_IMG[facing] || PLAYER_IMG.down;
-            return <Sprite src={src} size={TILE_SIZE} />;
+            return <Sprite src={src} size={TILE_SIZE * 1.3} />;
           })()}
         </div>
         {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
