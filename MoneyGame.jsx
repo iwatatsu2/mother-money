@@ -39,20 +39,80 @@ const CSS = `
 `;
 
 // ══════════════════════════════════════
+//  Pixel Sprite System (MOTHER2 style)
+// ══════════════════════════════════════
+const SP = { // palette
+  '.': null, k: '#1a1a2e', w: '#fff', W: '#e8e8e8', s: '#ffcc88', S: '#e8aa66',
+  r: '#e84040', R: '#c03030', b: '#4488ee', B: '#3366bb', g: '#44bb44', G: '#338833',
+  y: '#ffdd44', Y: '#ddbb22', c: '#44dddd', C: '#339999', p: '#cc66cc', P: '#aa44aa',
+  o: '#ff8844', O: '#dd6622', n: '#886644', N: '#664422', L: '#bbaa88', l: '#ddcc99',
+  m: '#888', M: '#666', d: '#3d6b35', D: '#2d5528', t: '#8b6914', T: '#6b4e0f',
+};
+// compact: each char = 1 pixel, rows separated by |
+const parseSprite = (data, size) => {
+  const rows = data.split('|');
+  return { rows, size };
+};
+const PixelSprite = React.memo(({ sprite, scale = 2, className = '', style = {} }) => {
+  if (!sprite) return null;
+  const { rows, size } = sprite;
+  const w = size * scale, h = rows.length * scale;
+  const rects = [];
+  for (let y = 0; y < rows.length; y++) {
+    for (let x = 0; x < rows[y].length; x++) {
+      const c = SP[rows[y][x]];
+      if (c) rects.push(<rect key={`${y}-${x}`} x={x * scale} y={y * scale} width={scale} height={scale} fill={c} />);
+    }
+  }
+  return <svg width={w} height={h} className={className} style={{ ...style, imageRendering: 'pixelated' }}>{rects}</svg>;
+});
+
+// ── Player sprites ──
+const PLAYER_SPRITES = {
+  down: parseSprite('.kkkkk.|krrrrk.|kssssk.|ks.ks.k|.kssk..|kbbbbk.|ksbbs.k|.ksskk.|.kk.kk.', 7),
+  up: parseSprite('.kkkkk.|kbbbbk.|kkkkkk.|.ksskk.|krrrrk.|ksrrsk.|.ksskk.|.kk.kk.', 7),
+  left: parseSprite('.kkkk.|krrrkk|ksssk.|ks.kk.|.ksk..|kbbbk.|ksbk..|.kkk..|.k.k..', 7),
+  right: parseSprite('.kkkk.|kkrrrk|.kssk.|.kk.sk|..ksk.|.kbbbk|..kbsk|..kkk.|..k.k.', 7),
+};
+// ── Vehicle sprites ──
+const VEHICLE_SPRITES = {
+  bike: parseSprite('..k...|.ksk..|.ksk..|kkkkk.|kMkkMk|k...kk|kMkMk.|.kkkkk|.kMkMk', 6),
+  car: parseSprite('.kkkkk.|kbbbbbk|kBBBBBk|rkkkkkr|rMMMMMr|kkMMMkk|kMk.kMk', 7),
+  plane: parseSprite('..kk..|.kWWk.|.kWWk.|kWWWWk|kWWWWk|bWWWWb|.kWWk.|..kk..', 6),
+  rocket: parseSprite('..kk..|.kWWk.|kWcWWk|kcccck|kccccck|rccccr|krkrkk|.kykyk', 6),
+};
+// ── Building sprites ──
+const BLDG_SPRITES = {
+  home: parseSprite('..kkkk.|.krrrrk|krrrrk.|kkkkkkk|kl.Wklk|kl.Wklk|klkkklk|klkNklk|kkkkkkk', 7),
+  bank: parseSprite('.kkkkk.|kYYYYYk|kkkkkkk|kWkWkWk|kWkWkWk|kkkkkkk|kWkkWWk|kWkBWWk|kkkkkkk', 7),
+  school: parseSprite('..kkk..|.kYYk..|kkkkkkk|kWWWWWk|kWkkWkk|kWkBWBk|kWkkWkk|kWkkkWk|kkkkkkk', 7),
+  shop: parseSprite('kkkkkkk|koooook|kOOOOOk|kkkkkkk|kWkkWkk|kWkgWpk|kWkkWkk|kWk..Wk|kkkkkkk', 7),
+  stock: parseSprite('kkkkkkk|kcccck.|kCCCCk.|kkkkkkk|kWkgGWk|kWkGgWk|kWkgGWk|kWkkkWk|kkkkkkk', 7),
+  station: parseSprite('.kkkkk.|krrrrrk|kkkkkkk|kWkkWWk|kWkMWWk|kWkkWWk|kkkkkkk|kMMMMMk|kkkkkkk', 7),
+};
+// ── Tile sprites (small 6x6) ──
+const TILE_SPRITES = {
+  tree: parseSprite('..kk..|.kddk.|kddDdk|kDddDk|.kDk..|..kk..', 6),
+  flower: parseSprite('......|.r..p.|ryr.pr|......|..r...|.ryr..', 6),
+  water: parseSprite('......|.cc...|..cC..|....cc|.c....|..cC..', 6),
+  fence: parseSprite('kk.kkk|kk.kkk|kkkkk.|kk.kkk|kk.kkk|.kkkkk', 6),
+};
+
+// ══════════════════════════════════════
 //  Tile types & styles
 // ══════════════════════════════════════
 const T = { GRASS: 0, PATH: 1, WATER: 2, TREE: 3, FLOWER: 4, FENCE: 5, ROAD: 6, SAND: 7, STONE: 8, DARK: 9 };
 const TILE_STYLE = {
-  [T.GRASS]:  { bg: '#4a7c3f', emoji: '' },
-  [T.PATH]:   { bg: '#c4a96a', emoji: '' },
-  [T.WATER]:  { bg: '#3b6ea5', emoji: '〜' },
-  [T.TREE]:   { bg: '#3d6b35', emoji: '🌲' },
-  [T.FLOWER]: { bg: '#4a7c3f', emoji: '🌸' },
-  [T.FENCE]:  { bg: '#8b7355', emoji: '▪' },
-  [T.ROAD]:   { bg: '#555', emoji: '' },
-  [T.SAND]:   { bg: '#dcc27a', emoji: '' },
-  [T.STONE]:  { bg: '#888', emoji: '' },
-  [T.DARK]:   { bg: '#2a2a3e', emoji: '' },
+  [T.GRASS]:  { bg: '#4a7c3f', sprite: null },
+  [T.PATH]:   { bg: '#c4a96a', sprite: null },
+  [T.WATER]:  { bg: '#3b6ea5', sprite: 'water' },
+  [T.TREE]:   { bg: '#3d6b35', sprite: 'tree' },
+  [T.FLOWER]: { bg: '#4a7c3f', sprite: 'flower' },
+  [T.FENCE]:  { bg: '#8b7355', sprite: 'fence' },
+  [T.ROAD]:   { bg: '#555', sprite: null },
+  [T.SAND]:   { bg: '#dcc27a', sprite: null },
+  [T.STONE]:  { bg: '#888', sprite: null },
+  [T.DARK]:   { bg: '#2a2a3e', sprite: null },
 };
 const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.DARK]);
 
@@ -909,13 +969,23 @@ export default function MotherMoneyGame() {
         <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${ROWS}, ${TILE_SIZE}px)` }}>
           {town.tiles.map((tile, i) => {
             const ts = TILE_STYLE[tile];
-            return <div key={i} className="flex items-center justify-center text-xs select-none" style={{ backgroundColor: ts.bg, fontSize: tile === T.TREE ? '14px' : '10px', color: 'rgba(255,255,255,0.3)' }}>{ts.emoji}</div>;
+            return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg }}>
+              {ts.sprite && TILE_SPRITES[ts.sprite] && <PixelSprite sprite={TILE_SPRITES[ts.sprite]} scale={5} />}
+            </div>;
           })}
         </div>
         {town.buildings.map((b, i) => (
-          <div key={i} className="absolute flex items-center justify-center" style={{ left: b.x * TILE_SIZE, top: b.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, fontSize: '20px', zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>{b.emoji}</div>
+          <div key={i} className="absolute flex items-center justify-center" style={{ left: b.x * TILE_SIZE, top: b.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
+            {BLDG_SPRITES[b.type] ? <PixelSprite sprite={BLDG_SPRITES[b.type]} scale={3} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
+          </div>
         ))}
-        <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, fontSize: '20px', zIndex: 20, transform: `scaleX(${facing === 'left' ? -1 : 1})`, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>{playerEmoji}</div>
+        <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 20, transform: `scaleX(${facing === 'left' ? -1 : 1})`, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
+          {(() => {
+            const vSprite = vehicle && VEHICLE_SPRITES[vehicle];
+            const pSprite = PLAYER_SPRITES[facing] || PLAYER_SPRITES.down;
+            return <PixelSprite sprite={vSprite || pSprite} scale={3} />;
+          })()}
+        </div>
         {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
           <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ で入る</div>
         )}
