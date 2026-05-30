@@ -73,28 +73,28 @@ const PixelSprite = React.memo(({ sprite, scale = 2, className = '', style = {} 
   return <canvas ref={canvasRef} width={size * scale} height={rows.length * scale} className={className} style={{ ...style, imageRendering: 'pixelated' }} />;
 });
 
-// ── Player sprites (12×14) ──
+// ── Player sprites (16×20, Famicom-level) ──
 const PLAYER_SPRITES = {
-  down: parseSprite('....rrrr....|...rrrrrr...|..rrrrrrrr..|..kssssssk..|..kskssksk..|..kssssssk..|...ssssss...|..bbyybbbb..|..bbyybbbb..|..bbbbbbbb..|...bbbbbb...|...bb..bb...|..rr..rr....|..rr..rr....', 12),
-  up: parseSprite('....rrrr....|...rrrrrr...|..rrrrrrrr..|..rkkkkkkr..|..rkkkkkkr..|..rkkkkkkr..|...ssssss...|..bbbbbbbb..|..bbbbbbbb..|..bbbbbbbb..|...bbbbbb...|...bb..bb...|..rr..rr....|..rr..rr....', 12),
-  left: parseSprite('...rrr......|..rrrr......|..rrrr......|..ksssr.....|..ksksr.....|..ksssr.....|...sss......|...bbybb....|..bbbbybb...|...bbbbb....|...bb.bb....|..bb..bb....|..rr..rr....|..rr..rr....', 12),
-  right: parseSprite('......rrr...|......rrrr..|......rrrr..|.....rsssk..|.....rsksk..|.....rsssk..|......sss...|....bbybb...|...bbybbb...|....bbbbb...|....bb.bb...|....bb..bb..|....rr..rr..|....rr..rr..', 12),
+  down: parseSprite('......kkkk......|.....krrrrk.....|....krrrrrrkk...|....krrrrrrrkk..|...kkkkkkkkkkk..|...kssssssssk...|..kkskksskskk...|..kssssssssssk..|...kssssssssk...|....kbbybbbk....|...kbbybbybk....|..ksbbbbbbbbsk..|..ksbbybbybbsk..|...kbbbbbbbbk...|....kBBBBBBk....|...kBBBkBBBBk...|...kBBBkkBBBk...|....kkk..kkk....|...krrk..krrk...|...kkkk..kkkk...', 16),
+  up: parseSprite('......kkkk......|.....krrrrk.....|....krrrrrrkk...|....krrrrrrrkk..|...kkNNNNNNkkk..|...kNNNNNNNNk...|..kkNNNNNNNNkk..|..kNNNNNNNNNNk..|...kNNNNNNNNk...|....kbbybbbk....|...kbbybbybk....|..ksbbbbbbbbsk..|..ksbbybbybbsk..|...kbbbbbbbbk...|....kBBBBBBk....|...kBBBkBBBBk...|...kBBBkkBBBk...|....kkk..kkk....|...krrk..krrk...|...kkkk..kkkk...', 16),
+  left: parseSprite('.....kkkk.......|....krrrrk......|...krrrrrrkk....|...krrrrrrrkk...|..kkkkkkkkkkk...|..kssssssssk....|.kkskkssssskk...|.ksssssssssk....|..kssssssssk....|...kbbybbk......|..skbbybbbk.....|.kskbbbbbbk.....|..kkbbybbk......|...kbbbbk.......|...kBBBBk.......|...kBBkBBk......|...kBk.kBk......|..kkk...kkk.....|..krrk.krrk.....|..kkkk.kkkk.....', 16),
+  right: parseSprite('.......kkkk.....|......krrrrk....|....kkrrrrrrkk..|...kkrrrrrrrk...|...kkkkkkkkkkk..|....kssssssssk..|...kkssssskkskkk|....ksssssssssk.|....kssssssssk..|......kbbybk....|.....kbbbybkks..|.....kbbbbbbksk.|......kbbybkk...|.......kbbbbk...|.......kBBBBk...|......kBBkBBk...|......kBk.kBk...|.....kkk...kkk..|.....krrk.krrk..|.....kkkk.kkkk..', 16),
 };
-// ── Vehicle sprites (10×10) ──
+// ── Vehicle sprites (Famicom-level) ──
 const VEHICLE_SPRITES = {
-  bike: parseSprite('.....mm...|....mmmm..|...mm.m...|..mm..m...|.mmmmmmmm.|mm..mm..mm|.m..mm..m.|.mmmmmmmm.|mm......mm|.mmmmmmmm.', 10),
-  car: parseSprite('..........|..mmmmmm..|.mbbbbbbm.|mmmmmmmmmm|rmmmmmmmmr|mllllllllm|mmmmmmmmmm|ymmmmmmmmy|.mn....nm.|.mmm..mmm.', 10),
-  plane: parseSprite('....mm....|...mwwm...|...mwwm...|..mwwwwm..|mmmwwwwmmm|..mwwwwm..|...mwwm...|...mbbm...|..mbbbbm..|....mm....', 10),
-  rocket: parseSprite('....ww....|...wrwm...|..wrrrwm..|..wrrrwm..|.wwrrrrw..|.mwrrrrwm.|..wrrrwm..|.mwmmmwm..|..yo..yo..|..yo..yo..', 10),
+  bike: parseSprite('....kk........|...knk........|...knkk.......|..knnnnkkk....|..k..knnnk....|.k...k..knk...|.k..k....knk..|kkkkk..kkkkkk.|kmmmkkkkmmmkk.|kmmmmkkmmmmk..|kmkmkk.kmkmk..|kmmmmk.kmmmmk.|.kmmk...kmmk..|..kk.....kk...', 14),
+  car: parseSprite('....kkkkkkk.....|...krrrrrrrkk...|..krrrrrrrrrrkk.|.kkccckrrkccckkk|krrrrrkrrkkrrrrk|krrrrrrrrrrrrrrk|kRRRRRRRRRRRRRRk|krrrrrrrrrrrrrrk|kkrrkkkkkkkrrkk.|.kmmkk...kkmmk..|.kmkmk...kmkmk..|..kkk.....kkk...', 16),
+  plane: parseSprite('.......kk.......|......kwwk......|.....kwwwwk.....|.....kwccwk.....|....kwwwwwwk....|....kwwwwwwk....|..kkwwwwwwwwkk..|.kwwwwwwwwwwwwk.|kwwwbwwwwwwbwwwk|.kkkkwwwwwwkkkk.|.....kwwwwk.....|....kwwwwwwk....|...kwbwwwwbwk...|....kkkkkkkk....', 16),
+  rocket: parseSprite('......kk......|.....kwwk.....|....kwwwwk....|....kwwwwk....|...kwwwwwwk...|...kwwccwwk...|...kwwccwwk...|...kwwwwwwk...|..kkwwwwwwkk..|..krwwwwwwrk..|.krrwwwwwwrrk.|.krkwwwwwwkrk.|.krkwwwwwwkrk.|kkrkwwrrwwkrkk|.kkkwrrrrrkkk.|..kkwrrrwwkk..|...kyooooyok..|....kyooyk....', 14),
 };
-// ── Building sprites (12×12) ──
+// ── Building sprites (16×16, Famicom-level) ──
 const BLDG_SPRITES = {
-  home: parseSprite('.....rr.....|....rrrr....|...rrrrrr...|..rrrrrrrr..|.rrrrrrrrrr.|llllllllllll|llwwllllwwll|llwwllllwwll|llllllllllll|llllnnnlllll|llllnnnlllll|llllnnnlllll', 12),
-  bank: parseSprite('..yyyyyyyy..|.yyyYyyyyy..|yyyyyyyyyyyy|yl.yl.yl.yll|yl.yl.yl.yll|yl.yl.yl.yll|yl.yl.yl.yll|llllllllllll|lllwwwwwwlll|lllwyyywwlll|lllwwnnwwlll|llllllllllll', 12),
-  school: parseSprite('....mmmm....|...mwwwwm...|...mwwwwm...|mmmmmmmmmmmm|lwwllwwllwwl|lwwllwwllwwl|llllllllllll|lwwllwwllwwl|lwwllwwllwwl|llllllllllll|lllllnnlllll|llllllllllll', 12),
-  shop: parseSprite('owowowowowow|wowowowowowo|owowowowowow|mmmmmmmmmmmm|lwwwwwwwwwwl|lwwwwwwwwwwl|lwwwwwwwwwwl|llllllllllll|llllnnnnllll|llllnnnnllll|llllnnnnllll|llllllllllll', 12),
-  stock: parseSprite('mmmmmmmmmmmm|mcccmmggggmm|mcccmmggggmm|mmmmmmmmmmmm|mcccmmggggmm|mcccmmggggmm|mmmmmmmmmmmm|mwwwwwwwwwwm|mwwwwwwwwwwm|mmmmmmmmmmmm|llllnnnnllll|llllllllllll', 12),
-  station: parseSprite('mmmmmmmmmmmm|m..mmmmmm..m|m..mmmmmm..m|mmmmmmmmmmmm|llllllllllll|lwwllllllwwl|llllllllllll|lllwwwwwwlll|llllllllllll|MMMMMMMMMMMM|.mm.mm.mm.mm|MMMMMMMMMMMM', 12),
+  home: parseSprite('......krrk......|....nkrrrrk.....|....krrrrrrk....|...kRrrrrrrRk...|..kRRrrrrrrRRk..|.kRRRrrrrrrRRRk.|kllllllllllllllk|klkbBkllllkbBklk|klkBbkllllkBbklk|kllllllllllllllk|kllllllllllllllk|klllllknnkllllkk|klllllknNkllllkk|klllllknNkllllkk|klllllknNkllllkk|kkkkkkkkkkkkkkkk', 16),
+  bank: parseSprite('......kyyk......|.....kyyyyk.....|....kYyyyyyyYk..|...kYYYYYYYYYYk.|kkkkkkkkkkkkkkkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kkkkkkkkkkkkkkkk|kWWWknnkkWWWWWkk|kWWWknNkkWWWWWkk|kWWWknNkkWWWWWkk|kkkkkkkkkkkkkkkk', 16),
+  school: parseSprite('.......kk.......|......kyyk......|.......kk.......|.....kmmmmk.....|....kmmmmmmk....|...kYYYYYYYYYk..|kkkkkkkkkkkkkkkk|klkbBklkbBklkbBk|klkBbklkBbklkBbk|kllllllllllllllk|klkbBklkbBklkbBk|klkBbklkBbklkBbk|kllllllllllllllk|kllllknnnnkllllk|kllllknNNnkllllk|kkkkkkkkkkkkkkkk', 16),
+  shop: parseSprite('kkkkkkkkkkkkkkkk|kowowowowowowowk|kwowowowowowOwOk|kkOkOkOkOkOkOkOk|kllllllllllllllk|kllllllllllllllk|klkkkkkkkkkkkllk|klkgkpkcklkkknlk|klkgkpkcklkkknlk|klkkkkkkkkkkknlk|kllllllllllllnlk|kllllllllllllnlk|kllllllllllllnlk|kllllllllllllnlk|kllllllllllllnlk|kkkkkkkkkkkkkkkk', 16),
+  stock: parseSprite('.......kk.......|........kk......|.kkkkkkkkkkkkkk.|.kcCcCcCcCcCcCk.|.kkkkkkkkkkkkkk.|.kgkgkgkgkgkgkkk|.kkkkkkkkkkkkkk.|.kmmmmmmmmmmmMk.|.kmmmmmmmmmmmMk.|.kmkbBkmmkbBkmk.|.kmkBbkmmkBbkmk.|.kmmmmmmmmmmmmk.|.kmmmmknnkmmmMk.|.kmmmmknNkmmmMk.|.kmmmmknNkmmmMk.|.kkkkkkkkkkkkkk.', 16),
+  station: parseSprite('....kkkkkkkk....|..kkmmmmmmmmkk..|.kmmmmmmmmmmmmk.|kMmmmmmmmmmmmmMk|kkkkkkkkkkkkkkkk|kWWkwwykWkWWWWWk|kWWkyWWkWkWWWWWk|kkkkkkkkkkkkkkkk|kWkk..kkWkk..kWk|kWk...kWWk...kWk|kWk...kWWk...kWk|kWk...kWWk...kWk|kkkkkkkkkkkkkkkk|kLnLnLnLnLnLnLkk|kkkkkkkkkkkkkkkk|kkkkkkkkkkkkkkkk', 16),
 };
 // ── Tile sprites (8×8) ──
 const TILE_SPRITES = {
@@ -986,14 +986,14 @@ export default function MotherMoneyGame() {
         </div>
         {town.buildings.map((b, i) => (
           <div key={i} className="absolute flex items-center justify-center" style={{ left: b.x * TILE_SIZE, top: b.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
-            {BLDG_SPRITES[b.type] ? <PixelSprite sprite={BLDG_SPRITES[b.type]} scale={3} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
+            {BLDG_SPRITES[b.type] ? <PixelSprite sprite={BLDG_SPRITES[b.type]} scale={2} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
           </div>
         ))}
         <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
           {(() => {
             const vSprite = vehicle && VEHICLE_SPRITES[vehicle];
             const pSprite = PLAYER_SPRITES[facing] || PLAYER_SPRITES.down;
-            return <PixelSprite sprite={vSprite || pSprite} scale={3} />;
+            return <PixelSprite sprite={vSprite || pSprite} scale={2} />;
           })()}
         </div>
         {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
