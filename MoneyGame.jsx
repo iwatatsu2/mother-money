@@ -48,6 +48,7 @@ const Sprite = React.memo(({ src, size = 40, className = '', style = {} }) => (
 const PLAYER_IMG = { down: '/sprites/player_down.png', up: '/sprites/player_up.png', left: '/sprites/player_left.png', right: '/sprites/player_right.png' };
 const VEHICLE_IMG = { bike: '/sprites/bike.png', car: '/sprites/car.png', plane: '/sprites/plane.png', rocket: '/sprites/rocket.png' };
 const BLDG_IMG = { home: '/sprites/home.png', bank: '/sprites/bank.png', school: '/sprites/school.png', shop: '/sprites/shop.png', stock: '/sprites/stock.png', station: '/sprites/station.png' };
+const NPC_IMG = { warrior: '/sprites/npc_warrior.png', slime: '/sprites/npc_slime.png', witch: '/sprites/npc_witch.png' };
 const TILE_IMG = { grass: '/sprites/grass.png', path: '/sprites/path.png', water: '/sprites/water.png', tree: '/sprites/tree.png', flower: '/sprites/flower.png', fence: '/sprites/fence.png', road: '/sprites/road.png', sand: '/sprites/sand.png', stone: '/sprites/stone.png', dark: '/sprites/dark.png' };
 
 // ══════════════════════════════════════
@@ -130,6 +131,29 @@ const town3Tiles = (() => {
 // ══════════════════════════════════════
 //  Towns
 // ══════════════════════════════════════
+const NPC_TIPS = {
+  warrior: [
+    'おかねは「つかう・ためる・ふやす」の3つにわけるんだ！',
+    'ぎんこうにあずけると「りし」がつくぞ！',
+    'ぶっかがあがると、おなじお金でかえるものがへるんだ。',
+    'ふくりはすごいぞ！10年で2ばいになることもある！',
+    'まいつきコツコツためるのが、いちばんのちかみちだ！',
+  ],
+  slime: [
+    'ぷるぷる〜♪ かぶはやすいときにかうのがコツだぷる！',
+    'ぼくはPERが15いかのかぶがすきだぷる〜',
+    'ぶんさんとうしってしってる？いろんなかぶをかうことだぷる！',
+    'ナンピンってね、さがったらもっとかうことだぷる♪',
+    'ROEがたかいかいしゃは、もうけじょうずだぷる〜',
+  ],
+  witch: [
+    '72のほうそく、しってる？72÷りりつ＝2ばいになるねんすう！',
+    'インフレのとき、げんきんだけもってるとそんするわ。',
+    'ETFってね、たくさんのかぶをまとめてかえるしょうひんよ！',
+    'さいけんはかぶよりリスクがひくいの。おぼえておいてね。',
+    'じかそうがくは、かぶか×はっこうすう。かいしゃのおおきさよ！',
+  ],
+};
 const TOWNS = [
   { id: 0, name: 'はじまりのむら', desc: 'のどかなむら。おかねのきほんをまなぼう！', tiles: town0Tiles, color: '#4a7c3f',
     buildings: [
@@ -139,6 +163,10 @@ const TOWNS = [
       { type: 'shop', x: 3, y: 8, emoji: '🛒', name: 'ショップ' },
       { type: 'stock', x: 7, y: 8, emoji: '📈', name: 'しょうけん' },
       { type: 'station', x: 12, y: 8, emoji: '🚉', name: 'えき' },
+    ],
+    npcs: [
+      { type: 'warrior', x: 5, y: 5, name: 'センシくん' },
+      { type: 'slime', x: 10, y: 5, name: 'ぷるお' },
     ],
     startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'bank_s'],
     shopItems: ['toy1', 'toy2', 'toy3', 'toy4', 'food1', 'food2', 'int6', 'car1'],
@@ -153,6 +181,10 @@ const TOWNS = [
       { type: 'home', x: 7, y: 8, emoji: '🏠', name: 'マンション' },
       { type: 'station', x: 11, y: 8, emoji: '🚉', name: 'シティえき' },
     ],
+    npcs: [
+      { type: 'slime', x: 9, y: 6, name: 'ぷるみ' },
+      { type: 'witch', x: 5, y: 6, name: 'マジカ' },
+    ],
     startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'bank_s', 'insure', 'energy'],
     shopItems: ['toy1', 'toy2', 'toy3', 'food1', 'food2', 'int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2'],
     rewardMult: 2, unlockReq: { asset: 3000, vehicle: 'bike' },
@@ -166,6 +198,10 @@ const TOWNS = [
       { type: 'home', x: 12, y: 3, emoji: '🏠', name: 'タワマン' },
       { type: 'station', x: 12, y: 8, emoji: '🚉', name: 'メトロえき' },
     ],
+    npcs: [
+      { type: 'warrior', x: 6, y: 6, name: 'ナイト' },
+      { type: 'witch', x: 10, y: 6, name: 'ウィズ' },
+    ],
     startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'energy', 'resort'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'house1', 'house2', 'land1'],
     rewardMult: 3, unlockReq: { asset: 15000, vehicle: 'car' },
@@ -178,6 +214,11 @@ const TOWNS = [
       { type: 'school', x: 4, y: 8, emoji: '🏫', name: 'せかい大学' },
       { type: 'shop', x: 10, y: 8, emoji: '🛒', name: 'せかいマーケット' },
       { type: 'station', x: 13, y: 6, emoji: '🚉', name: 'くうこう' },
+    ],
+    npcs: [
+      { type: 'warrior', x: 7, y: 3, name: 'マスター' },
+      { type: 'slime', x: 7, y: 8, name: 'キングぷる' },
+      { type: 'witch', x: 2, y: 6, name: 'アーク' },
     ],
     startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'space', 'energy', 'resort', 'crypto'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'car4', 'house1', 'house2', 'house3', 'land1', 'land2', 'land3'],
@@ -437,6 +478,8 @@ export default function MotherMoneyGame() {
   // 証券タブ
   const [stockTab, setStockTab] = useState('list'); // 'list'|'orders'|'analysis'
   const [sectorFilter, setSectorFilter] = useState('all');
+  // NPC
+  const [npcDialog, setNpcDialog] = useState(null); // { name, type, tip }
 
   // Derived
   const town = TOWNS[currentTown];
@@ -464,11 +507,20 @@ export default function MotherMoneyGame() {
     const nx = playerPos.x + dx, ny = playerPos.y + dy;
     if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) return;
     const bldg = town.buildings.find(b => b.x === nx && b.y === ny);
-    if (bldg || WALKABLE.has(town.tiles[ny * COLS + nx])) setPlayerPos({ x: nx, y: ny });
+    const npc = town.npcs?.find(n => n.x === nx && n.y === ny);
+    if (bldg || npc || WALKABLE.has(town.tiles[ny * COLS + nx])) setPlayerPos({ x: nx, y: ny });
   }, [activeBuilding, papaCall, playerPos, town]);
 
   const handleInteract = useCallback(() => {
     if (activeBuilding) return;
+    if (npcDialog) { setNpcDialog(null); return; }
+    const npc = town.npcs?.find(n => n.x === playerPos.x && n.y === playerPos.y);
+    if (npc) {
+      const tips = NPC_TIPS[npc.type] || [];
+      const tip = tips[Math.floor(Math.random() * tips.length)] || 'やあ！';
+      setNpcDialog({ name: npc.name, type: npc.type, tip });
+      return;
+    }
     const bldg = town.buildings.find(b => b.x === playerPos.x && b.y === playerPos.y);
     if (bldg) {
       setActiveBuilding(bldg.type);
@@ -476,7 +528,7 @@ export default function MotherMoneyGame() {
       setMiniGame(null); setMiniGameResult(null); setPlacingItem(null);
       setHomeTab('status'); setShopCat('おもちゃ');
     }
-  }, [activeBuilding, town, playerPos]);
+  }, [activeBuilding, npcDialog, town, playerPos]);
 
   // Keyboard
   useEffect(() => {
@@ -920,6 +972,24 @@ export default function MotherMoneyGame() {
         </div>
       )}
 
+      {/* NPC DIALOG */}
+      {npcDialog && (
+        <div className="fixed inset-0 bg-black/60 z-[90] flex items-end justify-center pb-8 px-4" onClick={() => setNpcDialog(null)}>
+          <div className="border-4 border-yellow-400 bg-gray-900 p-4 max-w-sm w-full pixel" style={{ animation: 'pop 0.3s ease-out' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              {NPC_IMG[npcDialog.type] && <img src={NPC_IMG[npcDialog.type]} className="w-12 h-12" style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />}
+              <div className="flex-1">
+                <div className="text-yellow-300 text-xs font-bold mb-1">{npcDialog.name}</div>
+                <div className="text-white text-xs leading-relaxed">{npcDialog.tip}</div>
+              </div>
+            </div>
+            <div className="text-center mt-3">
+              <button className="text-[10px] text-gray-400 border border-gray-600 px-3 py-1 cursor-pointer hover:bg-gray-800" onClick={() => setNpcDialog(null)}>とじる</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MAJOR EVENT MODAL */}
       {eventModal && (
         <div className="fixed inset-0 bg-black/90 z-[95] flex items-center justify-center p-4">
@@ -959,12 +1029,21 @@ export default function MotherMoneyGame() {
             {BLDG_IMG[b.type] ? <Sprite src={BLDG_IMG[b.type]} size={bSize} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
           </div>;
         })}
+        {(town.npcs || []).map((npc, i) => {
+          const nSize = TILE_SIZE * 1.4;
+          return <div key={'npc'+i} className="absolute flex items-end justify-center" style={{ left: npc.x * TILE_SIZE - (nSize - TILE_SIZE) / 2, top: npc.y * TILE_SIZE - (nSize - TILE_SIZE) * 0.8, width: nSize, height: nSize, zIndex: 15, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.6))', animation: 'float 2s ease-in-out infinite' }}>
+            {NPC_IMG[npc.type] && <Sprite src={NPC_IMG[npc.type]} size={nSize} />}
+          </div>;
+        })}
         <div className="absolute flex items-end justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE - TILE_SIZE * 0.15, top: playerPos.y * TILE_SIZE - TILE_SIZE * 0.3, width: TILE_SIZE * 1.3, height: TILE_SIZE * 1.3, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
           {(() => {
             const src = vehicle ? VEHICLE_IMG[vehicle] : PLAYER_IMG[facing] || PLAYER_IMG.down;
             return <Sprite src={src} size={TILE_SIZE * 1.3} />;
           })()}
         </div>
+        {town.npcs?.some(n => n.x === playerPos.x && n.y === playerPos.y) && !npcDialog && !activeBuilding && (
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ ではなす</div>
+        )}
         {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
           <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ で入る</div>
         )}
