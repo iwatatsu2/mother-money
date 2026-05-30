@@ -39,70 +39,16 @@ const CSS = `
 `;
 
 // ══════════════════════════════════════
-//  Pixel Sprite System (MOTHER2 style)
+//  PNG Sprite System (Famicom-level)
 // ══════════════════════════════════════
-const SP = { // palette
-  '.': null, k: '#1a1a2e', w: '#fff', W: '#e8e8e8', s: '#ffcc88', S: '#e8aa66',
-  r: '#e84040', R: '#c03030', b: '#4488ee', B: '#3366bb', g: '#44bb44', G: '#338833',
-  y: '#ffdd44', Y: '#ddbb22', c: '#44dddd', C: '#339999', p: '#cc66cc', P: '#aa44aa',
-  o: '#ff8844', O: '#dd6622', n: '#886644', N: '#664422', L: '#bbaa88', l: '#ddcc99',
-  m: '#888', M: '#666', d: '#3d6b35', D: '#2d5528', t: '#8b6914', T: '#6b4e0f',
-  H: '#ffd8a8', e: '#d4956a', a: '#aa4444', A: '#cc6666', v: '#5544cc', V: '#7766ee',
-};
-// compact: each char = 1 pixel, rows separated by |
-const parseSprite = (data, size) => {
-  const rows = data.split('|');
-  return { rows, size };
-};
-const PixelSprite = React.memo(({ sprite, scale = 2, className = '', style = {} }) => {
-  const canvasRef = useRef(null);
-  const { rows, size } = sprite || {};
-  useEffect(() => {
-    if (!sprite || !canvasRef.current) return;
-    const ctx = canvasRef.current.getContext('2d');
-    const w = size * scale, h = rows.length * scale;
-    ctx.clearRect(0, 0, w, h);
-    for (let y = 0; y < rows.length; y++) {
-      for (let x = 0; x < rows[y].length; x++) {
-        const c = SP[rows[y][x]];
-        if (c) { ctx.fillStyle = c; ctx.fillRect(x * scale, y * scale, scale, scale); }
-      }
-    }
-  }, [sprite, scale, rows, size]);
-  if (!sprite) return null;
-  return <canvas ref={canvasRef} width={size * scale} height={rows.length * scale} className={className} style={{ ...style, imageRendering: 'pixelated' }} />;
-});
-
-// ── Player sprites (16×20, Famicom-level) ──
-const PLAYER_SPRITES = {
-  down: parseSprite('......kkkk......|.....krrrrk.....|....krrrrrrkk...|....krrrrrrrkk..|...kkkkkkkkkkk..|...kssssssssk...|..kkskksskskk...|..kssssssssssk..|...kssssssssk...|....kbbybbbk....|...kbbybbybk....|..ksbbbbbbbbsk..|..ksbbybbybbsk..|...kbbbbbbbbk...|....kBBBBBBk....|...kBBBkBBBBk...|...kBBBkkBBBk...|....kkk..kkk....|...krrk..krrk...|...kkkk..kkkk...', 16),
-  up: parseSprite('......kkkk......|.....krrrrk.....|....krrrrrrkk...|....krrrrrrrkk..|...kkNNNNNNkkk..|...kNNNNNNNNk...|..kkNNNNNNNNkk..|..kNNNNNNNNNNk..|...kNNNNNNNNk...|....kbbybbbk....|...kbbybbybk....|..ksbbbbbbbbsk..|..ksbbybbybbsk..|...kbbbbbbbbk...|....kBBBBBBk....|...kBBBkBBBBk...|...kBBBkkBBBk...|....kkk..kkk....|...krrk..krrk...|...kkkk..kkkk...', 16),
-  left: parseSprite('.....kkkk.......|....krrrrk......|...krrrrrrkk....|...krrrrrrrkk...|..kkkkkkkkkkk...|..kssssssssk....|.kkskkssssskk...|.ksssssssssk....|..kssssssssk....|...kbbybbk......|..skbbybbbk.....|.kskbbbbbbk.....|..kkbbybbk......|...kbbbbk.......|...kBBBBk.......|...kBBkBBk......|...kBk.kBk......|..kkk...kkk.....|..krrk.krrk.....|..kkkk.kkkk.....', 16),
-  right: parseSprite('.......kkkk.....|......krrrrk....|....kkrrrrrrkk..|...kkrrrrrrrk...|...kkkkkkkkkkk..|....kssssssssk..|...kkssssskkskkk|....ksssssssssk.|....kssssssssk..|......kbbybk....|.....kbbbybkks..|.....kbbbbbbksk.|......kbbybkk...|.......kbbbbk...|.......kBBBBk...|......kBBkBBk...|......kBk.kBk...|.....kkk...kkk..|.....krrk.krrk..|.....kkkk.kkkk..', 16),
-};
-// ── Vehicle sprites (Famicom-level) ──
-const VEHICLE_SPRITES = {
-  bike: parseSprite('....kk........|...knk........|...knkk.......|..knnnnkkk....|..k..knnnk....|.k...k..knk...|.k..k....knk..|kkkkk..kkkkkk.|kmmmkkkkmmmkk.|kmmmmkkmmmmk..|kmkmkk.kmkmk..|kmmmmk.kmmmmk.|.kmmk...kmmk..|..kk.....kk...', 14),
-  car: parseSprite('....kkkkkkk.....|...krrrrrrrkk...|..krrrrrrrrrrkk.|.kkccckrrkccckkk|krrrrrkrrkkrrrrk|krrrrrrrrrrrrrrk|kRRRRRRRRRRRRRRk|krrrrrrrrrrrrrrk|kkrrkkkkkkkrrkk.|.kmmkk...kkmmk..|.kmkmk...kmkmk..|..kkk.....kkk...', 16),
-  plane: parseSprite('.......kk.......|......kwwk......|.....kwwwwk.....|.....kwccwk.....|....kwwwwwwk....|....kwwwwwwk....|..kkwwwwwwwwkk..|.kwwwwwwwwwwwwk.|kwwwbwwwwwwbwwwk|.kkkkwwwwwwkkkk.|.....kwwwwk.....|....kwwwwwwk....|...kwbwwwwbwk...|....kkkkkkkk....', 16),
-  rocket: parseSprite('......kk......|.....kwwk.....|....kwwwwk....|....kwwwwk....|...kwwwwwwk...|...kwwccwwk...|...kwwccwwk...|...kwwwwwwk...|..kkwwwwwwkk..|..krwwwwwwrk..|.krrwwwwwwrrk.|.krkwwwwwwkrk.|.krkwwwwwwkrk.|kkrkwwrrwwkrkk|.kkkwrrrrrkkk.|..kkwrrrwwkk..|...kyooooyok..|....kyooyk....', 14),
-};
-// ── Building sprites (16×16, Famicom-level) ──
-const BLDG_SPRITES = {
-  home: parseSprite('......krrk......|....nkrrrrk.....|....krrrrrrk....|...kRrrrrrrRk...|..kRRrrrrrrRRk..|.kRRRrrrrrrRRRk.|kllllllllllllllk|klkbBkllllkbBklk|klkBbkllllkBbklk|kllllllllllllllk|kllllllllllllllk|klllllknnkllllkk|klllllknNkllllkk|klllllknNkllllkk|klllllknNkllllkk|kkkkkkkkkkkkkkkk', 16),
-  bank: parseSprite('......kyyk......|.....kyyyyk.....|....kYyyyyyyYk..|...kYYYYYYYYYYk.|kkkkkkkkkkkkkkkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kwk.kwk.kwk.kwkk|kkkkkkkkkkkkkkkk|kWWWknnkkWWWWWkk|kWWWknNkkWWWWWkk|kWWWknNkkWWWWWkk|kkkkkkkkkkkkkkkk', 16),
-  school: parseSprite('.......kk.......|......kyyk......|.......kk.......|.....kmmmmk.....|....kmmmmmmk....|...kYYYYYYYYYk..|kkkkkkkkkkkkkkkk|klkbBklkbBklkbBk|klkBbklkBbklkBbk|kllllllllllllllk|klkbBklkbBklkbBk|klkBbklkBbklkBbk|kllllllllllllllk|kllllknnnnkllllk|kllllknNNnkllllk|kkkkkkkkkkkkkkkk', 16),
-  shop: parseSprite('kkkkkkkkkkkkkkkk|kowowowowowowowk|kwowowowowowOwOk|kkOkOkOkOkOkOkOk|kllllllllllllllk|kllllllllllllllk|klkkkkkkkkkkkllk|klkgkpkcklkkknlk|klkgkpkcklkkknlk|klkkkkkkkkkkknlk|kllllllllllllnlk|kllllllllllllnlk|kllllllllllllnlk|kllllllllllllnlk|kllllllllllllnlk|kkkkkkkkkkkkkkkk', 16),
-  stock: parseSprite('.......kk.......|........kk......|.kkkkkkkkkkkkkk.|.kcCcCcCcCcCcCk.|.kkkkkkkkkkkkkk.|.kgkgkgkgkgkgkkk|.kkkkkkkkkkkkkk.|.kmmmmmmmmmmmMk.|.kmmmmmmmmmmmMk.|.kmkbBkmmkbBkmk.|.kmkBbkmmkBbkmk.|.kmmmmmmmmmmmmk.|.kmmmmknnkmmmMk.|.kmmmmknNkmmmMk.|.kmmmmknNkmmmMk.|.kkkkkkkkkkkkkk.', 16),
-  station: parseSprite('....kkkkkkkk....|..kkmmmmmmmmkk..|.kmmmmmmmmmmmmk.|kMmmmmmmmmmmmmMk|kkkkkkkkkkkkkkkk|kWWkwwykWkWWWWWk|kWWkyWWkWkWWWWWk|kkkkkkkkkkkkkkkk|kWkk..kkWkk..kWk|kWk...kWWk...kWk|kWk...kWWk...kWk|kWk...kWWk...kWk|kkkkkkkkkkkkkkkk|kLnLnLnLnLnLnLkk|kkkkkkkkkkkkkkkk|kkkkkkkkkkkkkkkk', 16),
-};
-// ── Tile sprites (8×8) ──
-const TILE_SPRITES = {
-  tree: parseSprite('..dddD..|.ddddDD.|dddddDDD|dddddDDD|.ddddDD.|..dddD..|...tt...|...tt...', 8),
-  flower: parseSprite('gggrgggg|ggggggyg|grgggggg|ggggygrg|ggAggggg|ggggggrg|ggggAggg|ggrgggyg', 8),
-  water: parseSprite('bbBBbbBB|bBBbbBBb|BBbbBBbb|BbbBBbbB|bbBBbbBB|bBBbbBBb|BBbbBBbb|BbbBBbbB', 8),
-  fence: parseSprite('nn.nn.nn|nn.nn.nn|nnnnnnnn|nn.nn.nn|nn.nn.nn|nnnnnnnn|nn.nn.nn|nn.nn.nn', 8),
-};
+const Sprite = React.memo(({ src, size = 40, className = '', style = {} }) => (
+  <img src={src} width={size} height={size} className={className}
+    style={{ ...style, imageRendering: 'pixelated', objectFit: 'contain' }} draggable={false} />
+));
+const PLAYER_IMG = { down: '/sprites/player_down.png', up: '/sprites/player_up.png', left: '/sprites/player_left.png', right: '/sprites/player_right.png' };
+const VEHICLE_IMG = { bike: '/sprites/bike.png', car: '/sprites/car.png', plane: '/sprites/plane.png', rocket: '/sprites/rocket.png' };
+const BLDG_IMG = { home: '/sprites/home.png', bank: '/sprites/bank.png', school: '/sprites/school.png', shop: '/sprites/shop.png', stock: '/sprites/stock.png', station: '/sprites/station.png' };
+const TILE_IMG = { tree: '/sprites/tree.png', flower: '/sprites/flower.png', water: '/sprites/water.png', fence: '/sprites/fence.png' };
 
 // ══════════════════════════════════════
 //  Tile types & styles
@@ -111,10 +57,10 @@ const T = { GRASS: 0, PATH: 1, WATER: 2, TREE: 3, FLOWER: 4, FENCE: 5, ROAD: 6, 
 const TILE_STYLE = {
   [T.GRASS]:  { bg: '#4a7c3f', sprite: null },
   [T.PATH]:   { bg: '#c4a96a', sprite: null },
-  [T.WATER]:  { bg: '#3b6ea5', sprite: 'water' },
-  [T.TREE]:   { bg: '#3d6b35', sprite: 'tree' },
-  [T.FLOWER]: { bg: '#4a7c3f', sprite: 'flower' },
-  [T.FENCE]:  { bg: '#8b7355', sprite: 'fence' },
+  [T.WATER]:  { bg: '#3b6ea5', img: 'water' },
+  [T.TREE]:   { bg: '#3d6b35', img: 'tree' },
+  [T.FLOWER]: { bg: '#4a7c3f', img: 'flower' },
+  [T.FENCE]:  { bg: '#8b7355', img: 'fence' },
   [T.ROAD]:   { bg: '#555', sprite: null },
   [T.SAND]:   { bg: '#dcc27a', sprite: null },
   [T.STONE]:  { bg: '#888', sprite: null },
@@ -980,20 +926,19 @@ export default function MotherMoneyGame() {
           {town.tiles.map((tile, i) => {
             const ts = TILE_STYLE[tile];
             return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg }}>
-              {ts.sprite && TILE_SPRITES[ts.sprite] && <PixelSprite sprite={TILE_SPRITES[ts.sprite]} scale={5} />}
+              {ts.img && TILE_IMG[ts.img] && <Sprite src={TILE_IMG[ts.img]} size={TILE_SIZE} />}
             </div>;
           })}
         </div>
         {town.buildings.map((b, i) => (
           <div key={i} className="absolute flex items-center justify-center" style={{ left: b.x * TILE_SIZE, top: b.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
-            {BLDG_SPRITES[b.type] ? <PixelSprite sprite={BLDG_SPRITES[b.type]} scale={2} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
+            {BLDG_IMG[b.type] ? <Sprite src={BLDG_IMG[b.type]} size={TILE_SIZE} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
           </div>
         ))}
         <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
           {(() => {
-            const vSprite = vehicle && VEHICLE_SPRITES[vehicle];
-            const pSprite = PLAYER_SPRITES[facing] || PLAYER_SPRITES.down;
-            return <PixelSprite sprite={vSprite || pSprite} scale={2} />;
+            const src = vehicle ? VEHICLE_IMG[vehicle] : PLAYER_IMG[facing] || PLAYER_IMG.down;
+            return <Sprite src={src} size={TILE_SIZE} />;
           })()}
         </div>
         {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
