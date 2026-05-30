@@ -47,6 +47,7 @@ const SP = { // palette
   y: '#ffdd44', Y: '#ddbb22', c: '#44dddd', C: '#339999', p: '#cc66cc', P: '#aa44aa',
   o: '#ff8844', O: '#dd6622', n: '#886644', N: '#664422', L: '#bbaa88', l: '#ddcc99',
   m: '#888', M: '#666', d: '#3d6b35', D: '#2d5528', t: '#8b6914', T: '#6b4e0f',
+  H: '#ffd8a8', e: '#d4956a', a: '#aa4444', A: '#cc6666', v: '#5544cc', V: '#7766ee',
 };
 // compact: each char = 1 pixel, rows separated by |
 const parseSprite = (data, size) => {
@@ -54,48 +55,53 @@ const parseSprite = (data, size) => {
   return { rows, size };
 };
 const PixelSprite = React.memo(({ sprite, scale = 2, className = '', style = {} }) => {
-  if (!sprite) return null;
-  const { rows, size } = sprite;
-  const w = size * scale, h = rows.length * scale;
-  const rects = [];
-  for (let y = 0; y < rows.length; y++) {
-    for (let x = 0; x < rows[y].length; x++) {
-      const c = SP[rows[y][x]];
-      if (c) rects.push(<rect key={`${y}-${x}`} x={x * scale} y={y * scale} width={scale} height={scale} fill={c} />);
+  const canvasRef = useRef(null);
+  const { rows, size } = sprite || {};
+  useEffect(() => {
+    if (!sprite || !canvasRef.current) return;
+    const ctx = canvasRef.current.getContext('2d');
+    const w = size * scale, h = rows.length * scale;
+    ctx.clearRect(0, 0, w, h);
+    for (let y = 0; y < rows.length; y++) {
+      for (let x = 0; x < rows[y].length; x++) {
+        const c = SP[rows[y][x]];
+        if (c) { ctx.fillStyle = c; ctx.fillRect(x * scale, y * scale, scale, scale); }
+      }
     }
-  }
-  return <svg width={w} height={h} className={className} style={{ ...style, imageRendering: 'pixelated' }}>{rects}</svg>;
+  }, [sprite, scale, rows, size]);
+  if (!sprite) return null;
+  return <canvas ref={canvasRef} width={size * scale} height={rows.length * scale} className={className} style={{ ...style, imageRendering: 'pixelated' }} />;
 });
 
-// ── Player sprites ──
+// ── Player sprites (12×14) ──
 const PLAYER_SPRITES = {
-  down: parseSprite('.kkkkk.|krrrrk.|kssssk.|ks.ks.k|.kssk..|kbbbbk.|ksbbs.k|.ksskk.|.kk.kk.', 7),
-  up: parseSprite('.kkkkk.|kbbbbk.|kkkkkk.|.ksskk.|krrrrk.|ksrrsk.|.ksskk.|.kk.kk.', 7),
-  left: parseSprite('.kkkk.|krrrkk|ksssk.|ks.kk.|.ksk..|kbbbk.|ksbk..|.kkk..|.k.k..', 7),
-  right: parseSprite('.kkkk.|kkrrrk|.kssk.|.kk.sk|..ksk.|.kbbbk|..kbsk|..kkk.|..k.k.', 7),
+  down: parseSprite('....rrrr....|...rrrrrr...|..rrrrrrrr..|..kssssssk..|..kskssksk..|..kssssssk..|...ssssss...|..bbyybbbb..|..bbyybbbb..|..bbbbbbbb..|...bbbbbb...|...bb..bb...|..rr..rr....|..rr..rr....', 12),
+  up: parseSprite('....rrrr....|...rrrrrr...|..rrrrrrrr..|..rkkkkkkr..|..rkkkkkkr..|..rkkkkkkr..|...ssssss...|..bbbbbbbb..|..bbbbbbbb..|..bbbbbbbb..|...bbbbbb...|...bb..bb...|..rr..rr....|..rr..rr....', 12),
+  left: parseSprite('...rrr......|..rrrr......|..rrrr......|..ksssr.....|..ksksr.....|..ksssr.....|...sss......|...bbybb....|..bbbbybb...|...bbbbb....|...bb.bb....|..bb..bb....|..rr..rr....|..rr..rr....', 12),
+  right: parseSprite('......rrr...|......rrrr..|......rrrr..|.....rsssk..|.....rsksk..|.....rsssk..|......sss...|....bbybb...|...bbybbb...|....bbbbb...|....bb.bb...|....bb..bb..|....rr..rr..|....rr..rr..', 12),
 };
-// ── Vehicle sprites ──
+// ── Vehicle sprites (10×10) ──
 const VEHICLE_SPRITES = {
-  bike: parseSprite('..k...|.ksk..|.ksk..|kkkkk.|kMkkMk|k...kk|kMkMk.|.kkkkk|.kMkMk', 6),
-  car: parseSprite('.kkkkk.|kbbbbbk|kBBBBBk|rkkkkkr|rMMMMMr|kkMMMkk|kMk.kMk', 7),
-  plane: parseSprite('..kk..|.kWWk.|.kWWk.|kWWWWk|kWWWWk|bWWWWb|.kWWk.|..kk..', 6),
-  rocket: parseSprite('..kk..|.kWWk.|kWcWWk|kcccck|kccccck|rccccr|krkrkk|.kykyk', 6),
+  bike: parseSprite('.....mm...|....mmmm..|...mm.m...|..mm..m...|.mmmmmmmm.|mm..mm..mm|.m..mm..m.|.mmmmmmmm.|mm......mm|.mmmmmmmm.', 10),
+  car: parseSprite('..........|..mmmmmm..|.mbbbbbbm.|mmmmmmmmmm|rmmmmmmmmr|mllllllllm|mmmmmmmmmm|ymmmmmmmmy|.mn....nm.|.mmm..mmm.', 10),
+  plane: parseSprite('....mm....|...mwwm...|...mwwm...|..mwwwwm..|mmmwwwwmmm|..mwwwwm..|...mwwm...|...mbbm...|..mbbbbm..|....mm....', 10),
+  rocket: parseSprite('....ww....|...wrwm...|..wrrrwm..|..wrrrwm..|.wwrrrrw..|.mwrrrrwm.|..wrrrwm..|.mwmmmwm..|..yo..yo..|..yo..yo..', 10),
 };
-// ── Building sprites ──
+// ── Building sprites (12×12) ──
 const BLDG_SPRITES = {
-  home: parseSprite('..kkkk.|.krrrrk|krrrrk.|kkkkkkk|kl.Wklk|kl.Wklk|klkkklk|klkNklk|kkkkkkk', 7),
-  bank: parseSprite('.kkkkk.|kYYYYYk|kkkkkkk|kWkWkWk|kWkWkWk|kkkkkkk|kWkkWWk|kWkBWWk|kkkkkkk', 7),
-  school: parseSprite('..kkk..|.kYYk..|kkkkkkk|kWWWWWk|kWkkWkk|kWkBWBk|kWkkWkk|kWkkkWk|kkkkkkk', 7),
-  shop: parseSprite('kkkkkkk|koooook|kOOOOOk|kkkkkkk|kWkkWkk|kWkgWpk|kWkkWkk|kWk..Wk|kkkkkkk', 7),
-  stock: parseSprite('kkkkkkk|kcccck.|kCCCCk.|kkkkkkk|kWkgGWk|kWkGgWk|kWkgGWk|kWkkkWk|kkkkkkk', 7),
-  station: parseSprite('.kkkkk.|krrrrrk|kkkkkkk|kWkkWWk|kWkMWWk|kWkkWWk|kkkkkkk|kMMMMMk|kkkkkkk', 7),
+  home: parseSprite('.....rr.....|....rrrr....|...rrrrrr...|..rrrrrrrr..|.rrrrrrrrrr.|llllllllllll|llwwllllwwll|llwwllllwwll|llllllllllll|llllnnnlllll|llllnnnlllll|llllnnnlllll', 12),
+  bank: parseSprite('..yyyyyyyy..|.yyyYyyyyy..|yyyyyyyyyyyy|yl.yl.yl.yll|yl.yl.yl.yll|yl.yl.yl.yll|yl.yl.yl.yll|llllllllllll|lllwwwwwwlll|lllwyyywwlll|lllwwnnwwlll|llllllllllll', 12),
+  school: parseSprite('....mmmm....|...mwwwwm...|...mwwwwm...|mmmmmmmmmmmm|lwwllwwllwwl|lwwllwwllwwl|llllllllllll|lwwllwwllwwl|lwwllwwllwwl|llllllllllll|lllllnnlllll|llllllllllll', 12),
+  shop: parseSprite('owowowowowow|wowowowowowo|owowowowowow|mmmmmmmmmmmm|lwwwwwwwwwwl|lwwwwwwwwwwl|lwwwwwwwwwwl|llllllllllll|llllnnnnllll|llllnnnnllll|llllnnnnllll|llllllllllll', 12),
+  stock: parseSprite('mmmmmmmmmmmm|mcccmmggggmm|mcccmmggggmm|mmmmmmmmmmmm|mcccmmggggmm|mcccmmggggmm|mmmmmmmmmmmm|mwwwwwwwwwwm|mwwwwwwwwwwm|mmmmmmmmmmmm|llllnnnnllll|llllllllllll', 12),
+  station: parseSprite('mmmmmmmmmmmm|m..mmmmmm..m|m..mmmmmm..m|mmmmmmmmmmmm|llllllllllll|lwwllllllwwl|llllllllllll|lllwwwwwwlll|llllllllllll|MMMMMMMMMMMM|.mm.mm.mm.mm|MMMMMMMMMMMM', 12),
 };
-// ── Tile sprites (small 6x6) ──
+// ── Tile sprites (8×8) ──
 const TILE_SPRITES = {
-  tree: parseSprite('..kk..|.kddk.|kddDdk|kDddDk|.kDk..|..kk..', 6),
-  flower: parseSprite('......|.r..p.|ryr.pr|......|..r...|.ryr..', 6),
-  water: parseSprite('......|.cc...|..cC..|....cc|.c....|..cC..', 6),
-  fence: parseSprite('kk.kkk|kk.kkk|kkkkk.|kk.kkk|kk.kkk|.kkkkk', 6),
+  tree: parseSprite('..dddD..|.ddddDD.|dddddDDD|dddddDDD|.ddddDD.|..dddD..|...tt...|...tt...', 8),
+  flower: parseSprite('gggrgggg|ggggggyg|grgggggg|ggggygrg|ggAggggg|ggggggrg|ggggAggg|ggrgggyg', 8),
+  water: parseSprite('bbBBbbBB|bBBbbBBb|BBbbBBbb|BbbBBbbB|bbBBbbBB|bBBbbBBb|BBbbBBbb|BbbBBbbB', 8),
+  fence: parseSprite('nn.nn.nn|nn.nn.nn|nnnnnnnn|nn.nn.nn|nn.nn.nn|nnnnnnnn|nn.nn.nn|nn.nn.nn', 8),
 };
 
 // ══════════════════════════════════════
@@ -119,57 +125,59 @@ const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.
 // ══════════════════════════════════════
 //  Map builder
 // ══════════════════════════════════════
-const COLS = 12, ROWS = 9;
+const COLS = 16, ROWS = 12;
 const makeTiles = (base) => Array(ROWS * COLS).fill(base);
 const setRect = (t, x1, y1, x2, y2, v) => { const n = [...t]; for (let y = y1; y <= y2; y++) for (let x = x1; x <= x2; x++) n[y * COLS + x] = v; return n; };
 
 const town0Tiles = (() => {
   let t = makeTiles(T.GRASS);
-  t = setRect(t, 1, 4, 10, 4, T.PATH);
-  t = setRect(t, 5, 1, 5, 7, T.PATH);
-  t = setRect(t, 3, 2, 3, 6, T.PATH);
-  t = setRect(t, 8, 2, 8, 6, T.PATH);
-  for (let c = 0; c < COLS; c++) { t[c] = T.TREE; t[(ROWS - 1) * COLS + c] = T.TREE; }
-  for (let r = 0; r < ROWS; r++) { t[r * COLS] = T.TREE; t[r * COLS + COLS - 1] = T.TREE; }
-  t[4 * COLS + COLS - 1] = T.ROAD;
-  t = setRect(t, 9, 6, 10, 7, T.WATER);
-  t[2 * COLS + 2] = T.FLOWER; t[6 * COLS + 2] = T.FLOWER; t[2 * COLS + 10] = T.FLOWER;
+  t = setRect(t, 0, 0, 15, 0, T.TREE); t = setRect(t, 0, 11, 15, 11, T.TREE);
+  t = setRect(t, 0, 0, 0, 11, T.TREE); t = setRect(t, 15, 0, 15, 11, T.TREE);
+  t[6 * COLS + 15] = T.PATH;
+  t = setRect(t, 7, 1, 7, 10, T.PATH); t = setRect(t, 1, 6, 14, 6, T.PATH);
+  t = setRect(t, 1, 1, 2, 1, T.FLOWER); t = setRect(t, 13, 1, 14, 1, T.FLOWER);
+  t = setRect(t, 1, 10, 2, 10, T.FLOWER); t = setRect(t, 13, 10, 14, 10, T.FLOWER);
+  t = setRect(t, 10, 5, 11, 5, T.FLOWER);
+  t = setRect(t, 5, 4, 6, 5, T.WATER);
   return t;
 })();
 
 const town1Tiles = (() => {
   let t = makeTiles(T.DARK);
-  t = setRect(t, 0, 4, 11, 4, T.ROAD);
-  t = setRect(t, 5, 0, 5, 8, T.ROAD);
-  t = setRect(t, 2, 2, 9, 6, T.STONE);
-  t = setRect(t, 3, 3, 8, 5, T.PATH);
-  for (let c = 0; c < COLS; c++) { t[c] = T.FENCE; t[(ROWS - 1) * COLS + c] = T.FENCE; }
-  for (let r = 0; r < ROWS; r++) { t[r * COLS] = T.FENCE; t[r * COLS + COLS - 1] = T.FENCE; }
-  t[4 * COLS] = T.ROAD; t[4 * COLS + COLS - 1] = T.ROAD;
+  t = setRect(t, 0, 0, 15, 0, T.FENCE); t = setRect(t, 0, 11, 15, 11, T.FENCE);
+  t = setRect(t, 0, 0, 0, 11, T.FENCE); t = setRect(t, 15, 0, 15, 11, T.FENCE);
+  t[6 * COLS + 0] = T.ROAD; t[6 * COLS + 15] = T.ROAD;
+  t = setRect(t, 1, 2, 14, 2, T.ROAD); t = setRect(t, 1, 6, 14, 6, T.ROAD); t = setRect(t, 1, 10, 14, 10, T.ROAD);
+  t = setRect(t, 2, 1, 2, 10, T.ROAD); t = setRect(t, 8, 1, 8, 10, T.ROAD); t = setRect(t, 14, 1, 14, 10, T.ROAD);
+  t = setRect(t, 1, 1, 14, 1, T.STONE); t = setRect(t, 1, 5, 14, 5, T.STONE);
+  t = setRect(t, 1, 7, 14, 7, T.STONE); t = setRect(t, 1, 9, 14, 9, T.STONE);
+  [1,5,7,9].forEach(r => [2,8,14].forEach(c => { t[r * COLS + c] = T.ROAD; }));
   return t;
 })();
 
 const town2Tiles = (() => {
   let t = makeTiles(T.STONE);
-  t = setRect(t, 0, 4, 11, 4, T.ROAD);
-  t = setRect(t, 3, 0, 3, 8, T.ROAD); t = setRect(t, 8, 0, 8, 8, T.ROAD);
-  t = setRect(t, 0, 2, 11, 2, T.ROAD); t = setRect(t, 0, 6, 11, 6, T.ROAD);
-  for (let c = 0; c < COLS; c++) { t[c] = T.FENCE; t[(ROWS - 1) * COLS + c] = T.FENCE; }
-  for (let r = 0; r < ROWS; r++) { t[r * COLS] = T.FENCE; t[r * COLS + COLS - 1] = T.FENCE; }
-  t[4 * COLS] = T.ROAD; t[4 * COLS + COLS - 1] = T.ROAD;
+  t = setRect(t, 0, 0, 15, 0, T.FENCE); t = setRect(t, 0, 11, 15, 11, T.FENCE);
+  t = setRect(t, 0, 0, 0, 11, T.FENCE); t = setRect(t, 15, 0, 15, 11, T.FENCE);
+  t[6 * COLS + 0] = T.ROAD; t[6 * COLS + 15] = T.ROAD;
+  t = setRect(t, 1, 2, 14, 2, T.ROAD); t = setRect(t, 1, 5, 14, 5, T.ROAD);
+  t = setRect(t, 1, 6, 14, 6, T.ROAD); t = setRect(t, 1, 7, 14, 7, T.ROAD); t = setRect(t, 1, 10, 14, 10, T.ROAD);
+  t = setRect(t, 2, 1, 2, 10, T.ROAD); t = setRect(t, 6, 1, 6, 10, T.ROAD);
+  t = setRect(t, 10, 1, 10, 10, T.ROAD); t = setRect(t, 14, 1, 14, 10, T.ROAD);
   return t;
 })();
 
 const town3Tiles = (() => {
   let t = makeTiles(T.SAND);
-  t = setRect(t, 0, 4, 11, 4, T.ROAD);
-  t = setRect(t, 5, 0, 6, 8, T.ROAD);
-  t = setRect(t, 1, 1, 10, 1, T.ROAD); t = setRect(t, 1, 7, 10, 7, T.ROAD);
-  t = setRect(t, 2, 2, 4, 3, T.PATH); t = setRect(t, 7, 2, 9, 3, T.PATH);
-  t = setRect(t, 2, 5, 4, 6, T.PATH); t = setRect(t, 7, 5, 9, 6, T.PATH);
-  for (let c = 0; c < COLS; c++) { t[c] = T.WATER; t[(ROWS - 1) * COLS + c] = T.WATER; }
-  for (let r = 0; r < ROWS; r++) { t[r * COLS] = T.WATER; t[r * COLS + COLS - 1] = T.WATER; }
-  t[4 * COLS] = T.ROAD;
+  t = setRect(t, 15, 0, 15, 11, T.WATER); t = setRect(t, 0, 0, 15, 0, T.WATER);
+  t = setRect(t, 0, 11, 15, 11, T.WATER); t = setRect(t, 14, 0, 14, 11, T.WATER);
+  t[6 * COLS + 0] = T.ROAD;
+  t = setRect(t, 0, 6, 13, 6, T.ROAD);
+  t = setRect(t, 7, 1, 7, 10, T.ROAD); t = setRect(t, 2, 1, 2, 10, T.ROAD); t = setRect(t, 12, 1, 12, 10, T.ROAD);
+  t = setRect(t, 5, 4, 9, 4, T.PATH); t = setRect(t, 5, 8, 9, 8, T.PATH);
+  t = setRect(t, 3, 1, 6, 1, T.PATH); t = setRect(t, 8, 1, 11, 1, T.PATH);
+  t[2 * COLS + 5] = T.FLOWER; t[2 * COLS + 9] = T.FLOWER;
+  t[9 * COLS + 5] = T.FLOWER; t[9 * COLS + 9] = T.FLOWER;
   return t;
 })();
 
@@ -180,52 +188,52 @@ const TOWNS = [
   { id: 0, name: 'はじまりのむら', desc: 'のどかなむら。おかねのきほんをまなぼう！', tiles: town0Tiles, color: '#4a7c3f',
     buildings: [
       { type: 'home', x: 3, y: 2, emoji: '🏠', name: 'じぶんのいえ' },
-      { type: 'bank', x: 5, y: 2, emoji: '🏦', name: 'ぎんこう' },
-      { type: 'school', x: 8, y: 2, emoji: '🏫', name: 'がっこう' },
-      { type: 'shop', x: 3, y: 6, emoji: '🛒', name: 'ショップ' },
-      { type: 'stock', x: 5, y: 6, emoji: '📈', name: 'しょうけん' },
-      { type: 'station', x: 8, y: 6, emoji: '🚉', name: 'えき' },
+      { type: 'bank', x: 7, y: 2, emoji: '🏦', name: 'ぎんこう' },
+      { type: 'school', x: 12, y: 2, emoji: '🏫', name: 'がっこう' },
+      { type: 'shop', x: 3, y: 8, emoji: '🛒', name: 'ショップ' },
+      { type: 'stock', x: 7, y: 8, emoji: '📈', name: 'しょうけん' },
+      { type: 'station', x: 12, y: 8, emoji: '🚉', name: 'えき' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'bank_s'],
+    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'bank_s'],
     shopItems: ['toy1', 'toy2', 'toy3', 'toy4', 'food1', 'food2', 'int6', 'car1'],
     rewardMult: 1, unlockReq: null,
   },
   { id: 1, name: 'なかまちシティ', desc: 'にぎやかな町。ちゅうきゅうかぶがかえる！', tiles: town1Tiles, color: '#3a5fa0',
     buildings: [
-      { type: 'bank', x: 3, y: 3, emoji: '🏦', name: 'なかまちぎんこう' },
-      { type: 'school', x: 5, y: 3, emoji: '🏫', name: 'なかまち学園' },
-      { type: 'stock', x: 7, y: 3, emoji: '📈', name: 'シティしょうけん' },
-      { type: 'shop', x: 4, y: 5, emoji: '🛒', name: 'シティモール' },
-      { type: 'home', x: 6, y: 5, emoji: '🏠', name: 'マンション' },
-      { type: 'station', x: 8, y: 5, emoji: '🚉', name: 'シティえき' },
+      { type: 'bank', x: 4, y: 3, emoji: '🏦', name: 'なかまちぎんこう' },
+      { type: 'school', x: 7, y: 3, emoji: '🏫', name: 'なかまち学園' },
+      { type: 'stock', x: 11, y: 3, emoji: '📈', name: 'シティしょうけん' },
+      { type: 'shop', x: 4, y: 8, emoji: '🛒', name: 'シティモール' },
+      { type: 'home', x: 7, y: 8, emoji: '🏠', name: 'マンション' },
+      { type: 'station', x: 11, y: 8, emoji: '🚉', name: 'シティえき' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'bank_s', 'insure', 'energy'],
+    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'bank_s', 'insure', 'energy'],
     shopItems: ['toy1', 'toy2', 'toy3', 'food1', 'food2', 'int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2'],
     rewardMult: 2, unlockReq: { asset: 3000, vehicle: 'bike' },
   },
   { id: 2, name: 'おおえどメトロ', desc: 'だいとかい！こうがくなとうしができる！', tiles: town2Tiles, color: '#8a3fa0',
     buildings: [
       { type: 'bank', x: 4, y: 3, emoji: '🏦', name: 'メガバンク' },
-      { type: 'stock', x: 6, y: 3, emoji: '📈', name: 'おおえどしょうけん' },
-      { type: 'school', x: 4, y: 5, emoji: '🏫', name: 'おおえど大学' },
-      { type: 'shop', x: 6, y: 5, emoji: '🛒', name: 'ひゃっかてん' },
-      { type: 'home', x: 9, y: 3, emoji: '🏠', name: 'タワマン' },
-      { type: 'station', x: 9, y: 5, emoji: '🚉', name: 'メトロえき' },
+      { type: 'stock', x: 8, y: 3, emoji: '📈', name: 'おおえどしょうけん' },
+      { type: 'school', x: 4, y: 8, emoji: '🏫', name: 'おおえど大学' },
+      { type: 'shop', x: 8, y: 8, emoji: '🛒', name: 'ひゃっかてん' },
+      { type: 'home', x: 12, y: 3, emoji: '🏠', name: 'タワマン' },
+      { type: 'station', x: 12, y: 8, emoji: '🚉', name: 'メトロえき' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'energy', 'resort'],
+    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'energy', 'resort'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'house1', 'house2', 'land1'],
     rewardMult: 3, unlockReq: { asset: 15000, vehicle: 'car' },
   },
   { id: 3, name: 'せかいとし', desc: 'せかいのちゅうしん！ゆめのとうしができる！', tiles: town3Tiles, color: '#c4a020',
     buildings: [
-      { type: 'bank', x: 3, y: 2, emoji: '🏦', name: 'ワールドバンク' },
-      { type: 'stock', x: 8, y: 2, emoji: '📈', name: 'ワールドしょうけん' },
-      { type: 'school', x: 3, y: 5, emoji: '🏫', name: 'せかい大学' },
-      { type: 'shop', x: 8, y: 5, emoji: '🛒', name: 'せかいマーケット' },
-      { type: 'home', x: 3, y: 3, emoji: '🏠', name: 'ペントハウス' },
-      { type: 'station', x: 8, y: 6, emoji: '🚉', name: 'くうこう' },
+      { type: 'bank', x: 4, y: 3, emoji: '🏦', name: 'ワールドバンク' },
+      { type: 'stock', x: 10, y: 3, emoji: '📈', name: 'ワールドしょうけん' },
+      { type: 'home', x: 7, y: 5, emoji: '🏠', name: 'ペントハウス' },
+      { type: 'school', x: 4, y: 8, emoji: '🏫', name: 'せかい大学' },
+      { type: 'shop', x: 10, y: 8, emoji: '🛒', name: 'せかいマーケット' },
+      { type: 'station', x: 13, y: 6, emoji: '🚉', name: 'くうこう' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'space', 'energy', 'resort', 'crypto'],
+    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'space', 'energy', 'resort', 'crypto'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'car4', 'house1', 'house2', 'house3', 'land1', 'land2', 'land3'],
     rewardMult: 5, unlockReq: { asset: 50000, vehicle: 'plane' },
   },
@@ -864,7 +872,8 @@ export default function MotherMoneyGame() {
   const townStocks = stocks.filter(s => town.stocks.includes(s.id));
   const townShopItems = ALL_SHOP_ITEMS.filter(i => town.shopItems.includes(i.id));
   const shopCats = [...new Set(townShopItems.map(i => i.cat))];
-  const TILE_SIZE = 36;
+  const TILE_SIZE = 40;
+  const mapScale = typeof window !== 'undefined' ? Math.min(1, (window.innerWidth - 16) / (COLS * 40)) : 1;
 
   // ══════════════════════════════════════
   //  RENDER
@@ -965,6 +974,7 @@ export default function MotherMoneyGame() {
       )}
 
       {/* MAP */}
+      <div style={{ transform: `scale(${mapScale})`, transformOrigin: 'top center' }}>
       <div className="relative mt-1 border-4 border-cyan-400/60 bg-black" style={{ width: COLS * TILE_SIZE, height: ROWS * TILE_SIZE }}>
         <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${ROWS}, ${TILE_SIZE}px)` }}>
           {town.tiles.map((tile, i) => {
@@ -979,7 +989,7 @@ export default function MotherMoneyGame() {
             {BLDG_SPRITES[b.type] ? <PixelSprite sprite={BLDG_SPRITES[b.type]} scale={3} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
           </div>
         ))}
-        <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 20, transform: `scaleX(${facing === 'left' ? -1 : 1})`, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
+        <div className="absolute flex items-center justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE, top: playerPos.y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
           {(() => {
             const vSprite = vehicle && VEHICLE_SPRITES[vehicle];
             const pSprite = PLAYER_SPRITES[facing] || PLAYER_SPRITES.down;
@@ -989,6 +999,7 @@ export default function MotherMoneyGame() {
         {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
           <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ で入る</div>
         )}
+      </div>
       </div>
 
       {/* D-PAD */}
