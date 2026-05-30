@@ -204,6 +204,22 @@ const QUIZZES = [
   { q: "『ふくり』ってどんなちから？", a: ["りえきにもりえきがつく", "2ばいになる", "そんをする"], c: 0, e: "ゆきだるまみたいにふえる！" },
   { q: "もしものためにお金をためることを？", a: ["ちょきん（ひじょうきん）", "むだづかい", "とうし"], c: 0, e: "もしものお金はだいじ！" },
   { q: "かぶのねだんが下がったとき、どうする？", a: ["あわてずようすをみる", "すぐぜんぶうる", "もっとたくさんかう"], c: 0, e: "あわてないことがたいせつ！" },
+  // 株式指標クイズ
+  { q: "PER（ピーイーアール）ってなに？", a: ["かぶかをりえきでわったもの", "かぶかをうりあげでわったもの", "かぶかのへんどうりつ"], c: 0, e: "PER＝株価÷EPS。『何年分のりえきで元がとれるか』をしめす！" },
+  { q: "PERが10倍のかぶと30倍のかぶ。わりやすいのは？", a: ["PER10倍のほう", "PER30倍のほう", "おなじ"], c: 0, e: "PERがひくいほうが『わりやす』！10年分のりえきで元がとれる。" },
+  { q: "EPSってなに？", a: ["1かぶあたりのりえき", "かぶかのへんどうりつ", "かいしゃのかり金"], c: 0, e: "EPS＝じゅんりえき÷はっこうかぶ数。かいしゃの『かせぐちから』！" },
+  { q: "PBR（ピービーアール）ってなに？", a: ["かぶかをしさんでわったもの", "かぶかをうりあげでわったもの", "はいとうきんのわりあい"], c: 0, e: "PBR＝株価÷BPS。1倍いかなら『しさんよりやすい』かも！" },
+  { q: "PBRが0.8倍のかぶは？", a: ["しさんよりやすくかえる", "しさんよりたかい", "ふつうのねだん"], c: 0, e: "PBR1倍いかは『かいしゃをバラバラにしたほうが高い』じょうたい！" },
+  { q: "ROE（アールオーイー）ってなに？", a: ["しほんにたいするりえきのわりあい", "かぶかのへんどうりつ", "うりあげのしんちょうりつ"], c: 0, e: "ROE＝じゅんりえき÷じこしほん。たかいほどお金をじょうずにつかってる！" },
+  { q: "ROE20%のかいしゃとROE5%のかいしゃ、すごいのは？", a: ["ROE20%のほう", "ROE5%のほう", "おなじ"], c: 0, e: "ROE20%はとてもゆうしゅう！10%いじょうがめやす。" },
+  { q: "じかそうがくってなに？", a: ["かぶか×はっこうかぶ数", "かぶか÷りえき", "うりあげ×りえきりつ"], c: 0, e: "かいしゃの『ねだん』＝じかそうがく。おおきいほどだいきぎょう！" },
+  { q: "はいとうりまわりってなに？", a: ["1年のはいとう÷かぶかの%", "かぶかのへんどうりつ", "かいしゃのしゃっきん"], c: 0, e: "はいとうりまわり3%なら、100万えんで年3万えんもらえる！" },
+  { q: "かぶのリスクをはかるβ（ベータ）ってなに？", a: ["しじょうぜんたいとのれんどうせい", "かぶかのたかさ", "はいとうきんのおおさ"], c: 0, e: "β=1なら市場なみ。2ならしじょうの2ばいうごく！" },
+  { q: "ぶんさんとうしのメリットは？", a: ["リスクをへらせる", "かならずもうかる", "ぜいきんがやすくなる"], c: 0, e: "いろんなかぶにわけることで、1つがさがっても他でカバー！" },
+  { q: "『インデックスとうし』ってなに？", a: ["しじょうぜんたいにとうしする", "1つのかぶにしぼる", "がいこくのかぶだけかう"], c: 0, e: "日経平均やS&P500のようなしすうに連動させるとうしほう！" },
+  { q: "『ナンピン』ってなに？", a: ["さがったときにかいまし", "あがったときにうる", "すべてのかぶをうる"], c: 0, e: "へいきんしゅとくかかくを下げる作戦。でもリスクも！" },
+  { q: "『じゅうきゅう』でかぶがあがるのは？", a: ["かいたい人がおおいとき", "うりたい人がおおいとき", "だれもとりひきしないとき"], c: 0, e: "かいたい人＞うりたい人→かぶかUP！これがじゅうきゅうのほうそく。" },
+  { q: "『ストップ高』ってなに？", a: ["1日のじょうげんまであがること", "かぶかがゼロになること", "とりひきがとまること"], c: 0, e: "あまりにも急にうごくのをふせぐしくみ。ぎゃくはストップ安！" },
 ];
 
 const NEWS_POOL = [
@@ -240,23 +256,29 @@ const SECTORS = {
 };
 
 const ALL_STOCKS = [
-  // 生活（ディフェンシブ）
-  { id: 'candy', name: 'おかしカンパニー', price: 100, history: [95, 98, 100], trend: 0.012, vol: 0.05, icon: IceCream, color: '#FF69B4', desc: 'あんてい', dividend: 0.012, sector: 'life', beta: 0.6 },
-  { id: 'fish', name: 'おさかなマート', price: 80, history: [78, 79, 80], trend: 0.008, vol: 0.04, icon: Fish, color: '#4169E1', desc: 'はじめて向け', dividend: 0.018, sector: 'life', beta: 0.5 },
-  { id: 'pet', name: 'どうぶつえん', price: 150, history: [145, 148, 150], trend: 0.01, vol: 0.05, icon: Dog, color: '#DEB887', desc: 'はいとう高い', dividend: 0.025, sector: 'life', beta: 0.7 },
+  // 生活（ディフェンシブ） - eps: 1株利益, bps: 1株純資産, shares: 発行株数(万株)
+  { id: 'candy', name: 'おかしカンパニー', price: 100, history: [95, 98, 100], trend: 0.012, vol: 0.05, icon: IceCream, color: '#FF69B4', desc: 'あんてい', dividend: 0.012, sector: 'life', beta: 0.6, eps: 8, bps: 70, shares: 500 },
+  { id: 'fish', name: 'おさかなマート', price: 80, history: [78, 79, 80], trend: 0.008, vol: 0.04, icon: Fish, color: '#4169E1', desc: 'はじめて向け', dividend: 0.018, sector: 'life', beta: 0.5, eps: 6, bps: 65, shares: 300 },
+  { id: 'pet', name: 'どうぶつえん', price: 150, history: [145, 148, 150], trend: 0.01, vol: 0.05, icon: Dog, color: '#DEB887', desc: 'はいとう高い', dividend: 0.025, sector: 'life', beta: 0.7, eps: 12, bps: 100, shares: 400 },
   // テック
-  { id: 'game', name: 'ゲームファクトリー', price: 250, history: [240, 245, 250], trend: 0.025, vol: 0.10, icon: Gamepad2, color: '#7B68EE', desc: 'せいちょう', dividend: 0.005, sector: 'tech', beta: 1.3 },
-  { id: 'robo', name: 'ロボットラボ', price: 500, history: [480, 490, 500], trend: 0.035, vol: 0.14, icon: Zap, color: '#00CED1', desc: 'ハイリスク', dividend: 0, sector: 'tech', beta: 1.5 },
-  { id: 'ai', name: 'AIラボ', price: 800, history: [750, 770, 800], trend: 0.04, vol: 0.18, icon: Cpu, color: '#A78BFA', desc: 'さいしんぎじゅつ', dividend: 0, sector: 'tech', beta: 1.8 },
+  { id: 'game', name: 'ゲームファクトリー', price: 250, history: [240, 245, 250], trend: 0.025, vol: 0.10, icon: Gamepad2, color: '#7B68EE', desc: 'せいちょう', dividend: 0.005, sector: 'tech', beta: 1.3, eps: 10, bps: 80, shares: 800 },
+  { id: 'robo', name: 'ロボットラボ', price: 500, history: [480, 490, 500], trend: 0.035, vol: 0.14, icon: Zap, color: '#00CED1', desc: 'ハイリスク', dividend: 0, sector: 'tech', beta: 1.5, eps: 12, bps: 120, shares: 600 },
+  { id: 'ai', name: 'AIラボ', price: 800, history: [750, 770, 800], trend: 0.04, vol: 0.18, icon: Cpu, color: '#A78BFA', desc: 'さいしんぎじゅつ', dividend: 0, sector: 'tech', beta: 1.8, eps: 15, bps: 150, shares: 1000 },
   // 金融
-  { id: 'bank_s', name: 'まちのぎんこう', price: 200, history: [195, 198, 200], trend: 0.01, vol: 0.07, icon: Building2, color: '#FFD700', desc: 'きんゆう', dividend: 0.02, sector: 'finance', beta: 1.0 },
-  { id: 'insure', name: 'ほけんカンパニー', price: 300, history: [290, 295, 300], trend: 0.012, vol: 0.06, icon: Umbrella, color: '#38BDF8', desc: 'あんていはいとう', dividend: 0.022, sector: 'finance', beta: 0.9 },
+  { id: 'bank_s', name: 'まちのぎんこう', price: 200, history: [195, 198, 200], trend: 0.01, vol: 0.07, icon: Building2, color: '#FFD700', desc: 'きんゆう', dividend: 0.02, sector: 'finance', beta: 1.0, eps: 18, bps: 180, shares: 1200 },
+  { id: 'insure', name: 'ほけんカンパニー', price: 300, history: [290, 295, 300], trend: 0.012, vol: 0.06, icon: Umbrella, color: '#38BDF8', desc: 'あんていはいとう', dividend: 0.022, sector: 'finance', beta: 0.9, eps: 22, bps: 200, shares: 900 },
   // フロンティア
-  { id: 'space', name: 'うちゅうぼうけん', price: 1000, history: [950, 970, 1000], trend: 0.045, vol: 0.20, icon: Rocket, color: '#FF6347', desc: 'ゆめかぶ', dividend: 0, sector: 'frontier', beta: 2.0 },
-  { id: 'energy', name: 'エネルギーファーム', price: 400, history: [380, 390, 400], trend: 0.02, vol: 0.12, icon: Fuel, color: '#F97316', desc: 'しげんかぶ', dividend: 0.015, sector: 'frontier', beta: 1.4 },
-  { id: 'resort', name: 'しまリゾート', price: 350, history: [340, 345, 350], trend: 0.018, vol: 0.09, icon: Palmtree, color: '#34D399', desc: 'かんこう', dividend: 0.01, sector: 'frontier', beta: 1.2 },
-  { id: 'crypto', name: 'かそうコインしょ', price: 600, history: [550, 570, 600], trend: 0.05, vol: 0.25, icon: Bitcoin, color: '#F59E0B', desc: 'ちょうハイリスク', dividend: 0, sector: 'frontier', beta: 2.5 },
+  { id: 'space', name: 'うちゅうぼうけん', price: 1000, history: [950, 970, 1000], trend: 0.045, vol: 0.20, icon: Rocket, color: '#FF6347', desc: 'ゆめかぶ', dividend: 0, sector: 'frontier', beta: 2.0, eps: 5, bps: 200, shares: 2000 },
+  { id: 'energy', name: 'エネルギーファーム', price: 400, history: [380, 390, 400], trend: 0.02, vol: 0.12, icon: Fuel, color: '#F97316', desc: 'しげんかぶ', dividend: 0.015, sector: 'frontier', beta: 1.4, eps: 25, bps: 250, shares: 700 },
+  { id: 'resort', name: 'しまリゾート', price: 350, history: [340, 345, 350], trend: 0.018, vol: 0.09, icon: Palmtree, color: '#34D399', desc: 'かんこう', dividend: 0.01, sector: 'frontier', beta: 1.2, eps: 20, bps: 180, shares: 500 },
+  { id: 'crypto', name: 'かそうコインしょ', price: 600, history: [550, 570, 600], trend: 0.05, vol: 0.25, icon: Bitcoin, color: '#F59E0B', desc: 'ちょうハイリスク', dividend: 0, sector: 'frontier', beta: 2.5, eps: 3, bps: 50, shares: 1500 },
 ];
+// 株式指標の計算ヘルパー
+const calcPER = (price, eps) => eps > 0 ? (price / eps).toFixed(1) : '—';
+const calcPBR = (price, bps) => bps > 0 ? (price / bps).toFixed(2) : '—';
+const calcROE = (eps, bps) => bps > 0 ? ((eps / bps) * 100).toFixed(1) : '—';
+const calcMarketCap = (price, shares) => (price * shares / 10000).toFixed(1); // 億MM
+const perLabel = (per) => { const n = parseFloat(per); if (isNaN(n)) return ''; return n < 10 ? '🟢わりやす' : n < 20 ? '🟡ふつう' : n < 40 ? '🟠たかめ' : '🔴わりだか'; };
 
 // 景気サイクル
 const ECONOMY_PHASES = [
@@ -1028,6 +1050,15 @@ export default function MotherMoneyGame() {
                           {isOpen && (
                             <div className="mt-2 pt-2 border-t border-gray-700" onClick={e => e.stopPropagation()}>
                               <MiniChart history={st.history} color={st.color} />
+                              {/* 株式指標パネル */}
+                              <div className="grid grid-cols-3 gap-0.5 mt-1.5 mb-1.5">
+                                <div className="bg-gray-900 border border-gray-700 px-1 py-0.5 text-center"><div className="text-[8px] text-gray-500">PER</div><div className="text-[10px] text-cyan-300">{calcPER(st.price, st.eps)}倍</div><div className="text-[7px]">{perLabel(calcPER(st.price, st.eps))}</div></div>
+                                <div className="bg-gray-900 border border-gray-700 px-1 py-0.5 text-center"><div className="text-[8px] text-gray-500">PBR</div><div className="text-[10px] text-cyan-300">{calcPBR(st.price, st.bps)}倍</div></div>
+                                <div className="bg-gray-900 border border-gray-700 px-1 py-0.5 text-center"><div className="text-[8px] text-gray-500">ROE</div><div className="text-[10px] text-cyan-300">{calcROE(st.eps, st.bps)}%</div></div>
+                                <div className="bg-gray-900 border border-gray-700 px-1 py-0.5 text-center"><div className="text-[8px] text-gray-500">EPS</div><div className="text-[10px] text-yellow-300">{st.eps} MM</div></div>
+                                <div className="bg-gray-900 border border-gray-700 px-1 py-0.5 text-center"><div className="text-[8px] text-gray-500">BPS</div><div className="text-[10px] text-yellow-300">{st.bps} MM</div></div>
+                                <div className="bg-gray-900 border border-gray-700 px-1 py-0.5 text-center"><div className="text-[8px] text-gray-500">じかそうがく</div><div className="text-[10px] text-yellow-300">{calcMarketCap(st.price, st.shares)}億</div></div>
+                              </div>
                               <div className="flex items-center gap-1 mt-1 text-xs">{[1, 5, 10, 50].map(n => <button key={n} className={`px-1.5 py-0.5 border cursor-pointer ${buyQty === n ? 'border-yellow-400 text-yellow-200' : 'border-gray-600 text-gray-500'}`} onClick={() => setBuyQty(n)}>{n}</button>)}</div>
                               <div className="flex gap-1 mt-1 flex-wrap">
                                 <Btn variant="success" onClick={() => handleBuyStock(st.id, buyQty)} disabled={wallet < st.price * buyQty}>かう（{(st.price * buyQty).toLocaleString()}）</Btn>
