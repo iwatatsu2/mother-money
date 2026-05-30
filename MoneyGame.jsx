@@ -48,23 +48,23 @@ const Sprite = React.memo(({ src, size = 40, className = '', style = {} }) => (
 const PLAYER_IMG = { down: '/sprites/player_down.png', up: '/sprites/player_up.png', left: '/sprites/player_left.png', right: '/sprites/player_right.png' };
 const VEHICLE_IMG = { bike: '/sprites/bike.png', car: '/sprites/car.png', plane: '/sprites/plane.png', rocket: '/sprites/rocket.png' };
 const BLDG_IMG = { home: '/sprites/home.png', bank: '/sprites/bank.png', school: '/sprites/school.png', shop: '/sprites/shop.png', stock: '/sprites/stock.png', station: '/sprites/station.png' };
-const TILE_IMG = { tree: '/sprites/tree.png', flower: '/sprites/flower.png', water: '/sprites/water.png', fence: '/sprites/fence.png' };
+const TILE_IMG = { grass: '/sprites/grass.png', path: '/sprites/path.png', water: '/sprites/water.png', tree: '/sprites/tree.png', flower: '/sprites/flower.png', fence: '/sprites/fence.png', road: '/sprites/road.png', sand: '/sprites/sand.png', stone: '/sprites/stone.png', dark: '/sprites/dark.png' };
 
 // ══════════════════════════════════════
 //  Tile types & styles
 // ══════════════════════════════════════
 const T = { GRASS: 0, PATH: 1, WATER: 2, TREE: 3, FLOWER: 4, FENCE: 5, ROAD: 6, SAND: 7, STONE: 8, DARK: 9 };
 const TILE_STYLE = {
-  [T.GRASS]:  { bg: '#4a7c3f', sprite: null },
-  [T.PATH]:   { bg: '#c4a96a', sprite: null },
+  [T.GRASS]:  { bg: '#4a7c3f', img: 'grass' },
+  [T.PATH]:   { bg: '#c4a96a', img: 'path' },
   [T.WATER]:  { bg: '#3b6ea5', img: 'water' },
   [T.TREE]:   { bg: '#3d6b35', img: 'tree' },
   [T.FLOWER]: { bg: '#4a7c3f', img: 'flower' },
   [T.FENCE]:  { bg: '#8b7355', img: 'fence' },
-  [T.ROAD]:   { bg: '#555', sprite: null },
-  [T.SAND]:   { bg: '#dcc27a', sprite: null },
-  [T.STONE]:  { bg: '#888', sprite: null },
-  [T.DARK]:   { bg: '#2a2a3e', sprite: null },
+  [T.ROAD]:   { bg: '#555', img: 'road' },
+  [T.SAND]:   { bg: '#dcc27a', img: 'sand' },
+  [T.STONE]:  { bg: '#888', img: 'stone' },
+  [T.DARK]:   { bg: '#2a2a3e', img: 'dark' },
 };
 const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.DARK]);
 

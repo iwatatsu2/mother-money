@@ -5,62 +5,100 @@ const fs = require('fs');
 const OUT = path.join(__dirname, 'public', 'sprites');
 fs.mkdirSync(OUT, { recursive: true });
 
-// Extended palette for 32×32 sprites
+// ══════════════════════════════════════
+// MOTHER2-inspired extended palette
+// ══════════════════════════════════════
 const PAL = {
   '.': null, // transparent
-  'k': 0x1a1a2eff, // outline black
+  // Base
+  'k': 0x1a1a2eff, // outline dark
+  'K': 0x2a2a3eff, // soft outline
   'w': 0xffffffff, // white
-  'W': 0xe8e8e8ff, // light gray
-  's': 0xffcc88ff, // skin
-  'S': 0xe8aa66ff, // skin shadow
-  'H': 0xffd8a8ff, // skin highlight
-  'e': 0xd4956aff, // skin dark
-  'r': 0xe84040ff, // red
-  'R': 0xc03030ff, // dark red
-  'a': 0xaa2020ff, // deeper red
-  'b': 0x4488eeff, // blue
-  'B': 0x3366bbff, // dark blue
-  'g': 0x44bb44ff, // green
-  'G': 0x338833ff, // dark green
-  'y': 0xffdd44ff, // yellow
-  'Y': 0xddbb22ff, // dark yellow
-  'c': 0x44ddddff, // cyan
-  'C': 0x339999ff, // dark cyan
-  'p': 0xcc66ccff, // pink
-  'P': 0xaa44aaff, // dark pink
-  'o': 0xff8844ff, // orange
-  'O': 0xdd6622ff, // dark orange
-  'n': 0x886644ff, // brown
-  'N': 0x664422ff, // dark brown
-  'L': 0xbbaa88ff, // dark beige
-  'l': 0xddcc99ff, // beige
-  'm': 0x888888ff, // gray
-  'M': 0x666666ff, // dark gray
-  'd': 0x3d6b35ff, // leaf green
-  'D': 0x2d5528ff, // dark leaf
-  't': 0x8b6914ff, // trunk
-  'T': 0x6b4e0fff, // dark trunk
-  'i': 0xccaa77ff, // light wood
-  'I': 0x997744ff, // mid wood
-  'x': 0x556677ff, // steel blue
-  'X': 0x445566ff, // dark steel
-  'f': 0xff6666ff, // light red
-  'F': 0x88ccffff, // sky blue
-  'q': 0x44ff88ff, // bright green
-  'u': 0xff9900ff, // bright orange
-  'U': 0xcc7700ff, // dark orange2
-  'j': 0x99dd55ff, // lime
-  'z': 0xffaaff,   // light pink (no alpha issue, let me fix)
+  'W': 0xe8e8e8ff, // off-white
+  // Skin tones (warm, MOTHER2 style)
+  's': 0xffd8b0ff, // skin light
+  'S': 0xeebb88ff, // skin mid
+  'e': 0xd49860ff, // skin shadow
+  'E': 0xb87840ff, // skin deep shadow
+  // Reds (cap/shoes - Ness-like)
+  'r': 0xe84848ff, // red bright
+  'R': 0xc03030ff, // red dark
+  'a': 0x901818ff, // red deepest
+  // Blues (shirt/jeans)
+  'b': 0x5090e0ff, // blue
+  'B': 0x3868b0ff, // blue dark
+  '1': 0x284880ff, // blue deeper
+  // Yellows
+  'y': 0xf8d848ff, // yellow bright
+  'Y': 0xd0b030ff, // yellow dark
+  '2': 0xa89020ff, // yellow deep
+  // Greens (grass, trees - MOTHER2's lush greens)
+  'g': 0x58a848ff, // grass green
+  'G': 0x408838ff, // grass dark
+  '3': 0x306828ff, // grass deeper
+  '4': 0x78c858ff, // grass light
+  '5': 0x98d878ff, // grass highlight
+  // Tree greens (darker, richer)
+  'd': 0x48a040ff, // leaf green
+  'D': 0x308030ff, // leaf dark
+  '6': 0x206020ff, // leaf shadow
+  '7': 0x68b858ff, // leaf light
+  '8': 0x88d070ff, // leaf highlight
+  // Browns (earth, wood, trunks)
+  'n': 0x906830ff, // brown
+  'N': 0x704818ff, // brown dark
+  't': 0x886020ff, // trunk
+  'T': 0x684010ff, // trunk dark
+  'i': 0xc8a868ff, // light wood
+  'I': 0xa08848ff, // mid wood
+  // Path/sand colors
+  'l': 0xd8c888ff, // beige light
+  'L': 0xc0b070ff, // beige dark
+  '9': 0xe8d898ff, // sand light
+  '0': 0xb8a060ff, // sand dark
+  // Grays (stone, metal)
+  'm': 0x989898ff, // gray
+  'M': 0x707070ff, // gray dark
+  'x': 0xb0b0b0ff, // gray light
+  'X': 0x585858ff, // gray deep
+  // Water (MOTHER2 blue tones)
+  'c': 0x58a8d8ff, // water light
+  'C': 0x3878a8ff, // water mid
+  'h': 0x205880ff, // water dark
+  'H': 0x78c8f0ff, // water highlight
+  // Oranges
+  'o': 0xf08030ff, // orange
+  'O': 0xc06020ff, // dark orange
+  // Pinks/purples
+  'p': 0xe870a0ff, // pink
+  'P': 0xb85080ff, // dark pink
+  // Cyan
+  'q': 0x50d0d0ff, // cyan
+  'Q': 0x38a0a0ff, // dark cyan
+  // Roof tile colors
+  'f': 0xd85040ff, // roof red
+  'F': 0xb03828ff, // roof dark red
+  'v': 0xa04030ff, // roof deep
+  // Window
+  'j': 0x88c8f8ff, // window blue
+  'J': 0x60a0d0ff, // window dark
+  'z': 0xa8d8f8ff, // window highlight
+  // Door
+  'u': 0xb07030ff, // door brown
+  'U': 0x885020ff, // door dark
+  // Purple
+  'V': 0x8860b0ff, // purple
+  'Z': 0x684090ff, // dark purple
 };
-// Fix z - needs alpha
-PAL['z'] = 0xffaaffff;
 
 function makeSprite(rows, w) {
   const h = rows.length;
-  const img = new Jimp(w, h, 0x00000000); // transparent
+  const img = new Jimp(w, h, 0x00000000);
   for (let y = 0; y < h; y++) {
-    for (let x = 0; x < rows[y].length && x < w; x++) {
-      const c = PAL[rows[y][x]];
+    const row = rows[y];
+    for (let x = 0; x < w; x++) {
+      const ch = x < row.length ? row[x] : '.';
+      const c = PAL[ch];
       if (c) img.setPixelColor(c, x, y);
     }
   }
@@ -68,569 +106,645 @@ function makeSprite(rows, w) {
 }
 
 // ══════════════════════════════════════
-// PLAYER SPRITES (32×40) - MOTHER2's Ness-like boy
+// TILE SPRITES (16×16) - MOTHER2 textured
 // ══════════════════════════════════════
 const sprites = {};
 
-// PLAYER DOWN (32 wide, 40 tall)
-sprites.player_down = {
+// GRASS - lush MOTHER2 style with subtle pattern
+sprites.grass = {
+  w: 16, rows: [
+    'gG4gggGg4gggGggg',
+    'gg5gGggg4gGgggGg',
+    'gGggg4gGggggg4gg',
+    'ggggGggg5gGg4ggg',
+    'g4ggg5ggGggggGgg',
+    'gGgGgggggg4ggggg',
+    'ggg4gGgGgggggG4g',
+    'gGggggg4gGg5gggg',
+    'ggGg4gggggggg4Gg',
+    'g4ggGgGg4gggGggg',
+    'ggggg4gGggg4ggGg',
+    'gGg5ggggGggggggg',
+    'gg4gGg4ggg5gGg4g',
+    'gggggGggg4ggggGg',
+    'gGg4gggg5ggGgggg',
+    'ggGggGg4ggggg4Gg',
+  ]
+};
+
+// PATH - MOTHER2 dirt path
+sprites.path = {
+  w: 16, rows: [
+    'lLl9lLllL9llLl9l',
+    'Ll9lllLll0lLlllL',
+    'l0lLl9lLllll9lLl',
+    'LllllL0llLl0llll',
+    'l9lLlll9lllllLl9',
+    'llll0lLllL9lLlll',
+    'lLl9lllLlll0ll9l',
+    'Ll0llLl9llLlllLl',
+    'l9lllll0lLlll9ll',
+    'lllLl9llllL0lLll',
+    'lL0llllLl9lllll9',
+    'llll9lLllll9lLll',
+    'l9lLlll0lLlllLl0',
+    'Lllll9lllll0llll',
+    'lLl0lLll9lLlll9l',
+    'l9lllll0llllLlll',
+  ]
+};
+
+// ROAD - asphalt with subtle texture
+sprites.road = {
+  w: 16, rows: [
+    'MXMMMXMMMMXMMMMx',
+    'MMMMMMXMMMMMXMMM',
+    'XMMxMMMMMXMMMMMM',
+    'MMMMMMMXMMMMXMMM',
+    'MMXMMMMMMMMMMMxM',
+    'MMMMMXMMMMXMMMMM',
+    'MxMMMMMXMMMMMMMX',
+    'MMMMXMMMMMMMXMMM',
+    'MMMMMMMxMMMMMMMM',
+    'MXMMMMMMMXMMMxMM',
+    'MMMxMMMMMMMMMMMX',
+    'MMMMMMXMMMMXMMMM',
+    'MxMMMMMMMMMMMMMM',
+    'MMMMMxMMXMMMMMxM',
+    'MMMMMMMMMMMXMMMM',
+    'XMMMxMMMMMMMMMXM',
+  ]
+};
+
+// SAND - warm beach MOTHER2
+sprites.sand = {
+  w: 16, rows: [
+    '9090990909009900',
+    '099009009099090l',
+    '90990990090090l9',
+    '009009909009909l',
+    '990900090990009l',
+    '090990900090900l',
+    '9009009099009090',
+    '0990990090900990',
+    '909009009909009l',
+    '090990990090990l',
+    '9009009009009009',
+    '009090990900900l',
+    '990900090990099l',
+    '099009909009009l',
+    '90990090090990l9',
+    '009009009900090l',
+  ]
+};
+
+// STONE - cobblestone texture
+sprites.stone = {
+  w: 16, rows: [
+    'xmmxMxmmMxmxMxmm',
+    'mMxmmxmxmmMxmmxm',
+    'xmmMxmMxmxmmxmMx',
+    'MxmmxmmxMxmMxmmm',
+    'mmxMxmxmmxmmMxmx',
+    'xmmmmxMxmMxmmxmM',
+    'mMxmxmmxmmxmxmmx',
+    'xmmMxmMxmMxmMxmx',
+    'MxmmxmmxmmxmmxmM',
+    'mmxMxmxmMxmxMxmm',
+    'xmmmmMxmmxmmmxmx',
+    'mxmxmmxmMxmMxmmM',
+    'MxmmMxmxmmxmmxmm',
+    'mmxmmmMxmxmMxmxm',
+    'xmMxmxmmxmmmmxMx',
+    'mxmmMxmxMxmxmmxm',
+  ]
+};
+
+// DARK - night/indoor tile
+sprites.dark = {
+  w: 16, rows: [
+    'KXKKXKKKXKKKKXKK',
+    'KKKKXKXKKKKXKKKX',
+    'KXKKKKKXKKKKKKXK',
+    'KKKKXKKKKXKXKKKK',
+    'KXKKKXKKKKKKKXKK',
+    'KKKKKKXKKXKKKKKX',
+    'KXKKXKKKKKXKKXKK',
+    'KKKKKKXKKKKKKKKX',
+    'KXKKKKKXKKXKKKXK',
+    'KKXKKXKKKKKKXKKK',
+    'KKKKKKKXKKXKKKKX',
+    'KXKKXKKKKKKKXKKK',
+    'KKKKKKXKKXKKKKKK',
+    'KXKKXKKKKKKKXKXK',
+    'KKKKKKXKXKKKKKKK',
+    'KXKKKKKKKXKKXKKK',
+  ]
+};
+
+// TREE - round, lush MOTHER2 tree
+sprites.tree = {
+  w: 16, rows: [
+    '....k7887k......',
+    '...k788d87k.....',
+    '..k78dddd8dk....',
+    '.k78dddddddDk..',
+    '.k8dddddd7dDk..',
+    'k7ddddddd8dDDk.',
+    'kddddddddddDDk.',
+    'k8dddddddddDDk.',
+    '.kddddddddDDk..',
+    '..kddddddDDk...',
+    '...kkddddkk....',
+    '.....kttk.......',
+    '.....kTtk.......',
+    '.....kTTk.......',
+    '....kNTTNk......',
+    '....kkkkkk......',
+  ]
+};
+
+// FLOWER - MOTHER2 grass with flowers
+sprites.flower = {
+  w: 16, rows: [
+    'g4grgGg4ggGgpg4g',
+    'gGggggg5gggggGgg',
+    'g5gpggGggg4grg5g',
+    'gggggggg4ggggggg',
+    'gGg4grgggGg5ggGg',
+    'ggg5gggGgggggggg',
+    'g4gggGg5g4gpgggg',
+    'gggpggggggggg4gG',
+    'gGg5gg4grggGgggg',
+    'gggggggggg5ggg4g',
+    'g4grgGg5ggggpggg',
+    'ggg5ggggg4gggGgg',
+    'gGgggpg4ggggrg5g',
+    'g5gggggGg5gggggg',
+    'ggg4gGggggG5ggGg',
+    'gGggggrggggggg4g',
+  ]
+};
+
+// WATER - animated-look MOTHER2 water
+sprites.water = {
+  w: 16, rows: [
+    'CCcHCCchCCcHCCch',
+    'cCCCcHCCcCCCcHCC',
+    'CCchCCCCCCchCCCC',
+    'cHCCcCChcHCCcCCh',
+    'CCCCcHCCCCCCcHCC',
+    'cCchCCCCcCchCCCC',
+    'CCCCcCChCCCCcCCh',
+    'cHCCCHCCcHCCCHCC',
+    'CCchCCCCCCchCCCC',
+    'cCCCcHCCcCCCcHCC',
+    'CCCCCCchCCCCCCch',
+    'cHCCcCCCcHCCcCCC',
+    'CCcHCCCCCCcHCCCC',
+    'cCCCcCChcCCCcCCh',
+    'CCchCHCCCCchCHCC',
+    'cCCCCCCCcCCCCCCC',
+  ]
+};
+
+// FENCE - wooden fence MOTHER2 style
+sprites.fence = {
+  w: 16, rows: [
+    '.n.n..n.n..n.n..',
+    '.nIn..nIn..nIn..',
+    '.nIn..nIn..nIn..',
+    'inIniiNIniinIniI',
+    '.nIn..nIn..nIn..',
+    '.nIn..nIn..nIn..',
+    '.nIn..nIn..nIn..',
+    'INiNIInINIINiNII',
+    '.NiN..NiN..NiN..',
+    '.NiN..NiN..NiN..',
+    '.NiN..NiN..NiN..',
+    'iNiNiiNINiiNiNiI',
+    '.NiN..NiN..NiN..',
+    '.NiN..NiN..NiN..',
+    '.NiN..NiN..NiN..',
+    'INiNIINiNIINiNII',
+  ]
+};
+
+// ══════════════════════════════════════
+// BUILDING SPRITES (32×32) - MOTHER2 warm, detailed
+// ══════════════════════════════════════
+
+// HOME - cozy MOTHER2 house with red roof
+sprites.home = {
   w: 32, rows: [
-    '..........kkkkkkkkkkkk..........',
-    '.........krrrrrrrrrrrrk.........',
-    '........krrrrrrrrrrrrrrk........',
-    '........krrrrrrrrrrrrrrk........',
-    '.......krrrrrrrrrrrrrrrrk.......',
-    '.......kRRRRRRRRRRRRRRRRk......',
-    '.......kkkkkkkkkkkkkkkkkkk......',
-    '......kHssssssssssssssssHk.....',
-    '.....kksssssssssssssssssskk....',
-    '.....ksssskssskssksssksssk.....',
-    '.....kssskkwBkksskwBkkssskk....',
-    '.....ksssskwBkssskwBksssskk....',
-    '......kssskssskssksssksssk.....',
-    '......ksssssssssssssssssk......',
-    '.......ksssssseeeessssk........',
-    '.......kksssssssssssskk........',
-    '........kksssssssssskk.........',
-    '.......kbbbbbbbbbbbbbbk........',
-    '......kbbbybbbbbbbbybbbk.......',
-    '......kbbbybbbbbbbbybbbk.......',
-    '.....kbbbbbbbbbbbbbbbbbk.......',
-    '.....kbbbbbbbbbbbbbbbbbk.......',
-    '....ksbbbbbbbbbbbbbbbbsbk.....',
-    '....kssbbbbbbbbbbbbbbssbk.....',
-    '.....kssbbbbbbbbbbbbbsskk.....',
-    '......kkbbbbbbbbbbbbkk........',
-    '.......kBBBBBkBBBBBBk.........',
-    '.......kBBBBBkkBBBBBk.........',
-    '......kkBBBBk..kBBBBkk........',
-    '......kBBBBkk..kkBBBBk........',
-    '.......kkkkk....kkkkk.........',
-    '......krrrrk....krrrrk........',
-    '......krrrrk....krrrrk........',
-    '......kRRRRk....kRRRRk........',
-    '.......kkkk......kkkk.........',
+    '................................',
+    '..............kkkk..............',
+    '.............kffffk.............',
+    '............kffffffk............',
+    '...........kffffffffk...........',
+    '..........kffffffffffk..........',
+    '.........kFFffffffffffk.........',
+    '........kFFfffffffFFfffk........',
+    '.......kFFffffffFFFfffffk.......',
+    '......kFFFfffffFFFFffffffk......',
+    '.....kFFFffffFFFFFfffffffFk.....',
+    '....kkvvvvvvvvvvvvvvvvvvvvkk....',
+    '....killllllllllllllllllllIk....',
+    '....kIlljjjjklllllkjjjjllIk....',
+    '....kIllzjjjkllllllkjjzllIk....',
+    '....kIlljJjjklllllkJjjjllIk....',
+    '....kIllkkkkkllllllkkkkkllk....',
+    '....kIlllllllllllllllllllIk....',
+    '....kIlllllllkuuuuklllllIk....',
+    '....kIlllllllkUnnUklllllIk....',
+    '....kIlllllllkUnnUklllllIk....',
+    '....kIlllllllkUnnUklllllIk....',
+    '....kkkkkkkkkkkkkkkkkkkkkkk....',
+    '................................',
+  ]
+};
+
+// BANK - grand stone building
+sprites.bank = {
+  w: 32, rows: [
+    '................................',
+    '.........kyyyyyyyyyyyk..........',
+    '........kYYYYYYYYYYYYYk.........',
+    '.......kkkkkkkkkkkkkkkkkk.......',
+    '.......kk..kk..kk..kk..k.......',
+    '......kkxkkxkkxkkxkkxkkxkk......',
+    '......kxWxkxWxkxWxkxWxkxk......',
+    '......kxWxkxWxkxWxkxWxkxk......',
+    '......kxWxkxWxkxWxkxWxkxk......',
+    '......kxWxkxWxkxWxkxWxkxk......',
+    '......kxWxkxWxkxWxkxWxkxk......',
+    '......kxWxkxWxkxWxkxWxkxk......',
+    '......kkkkkkkkkkkkkkkkkkk.......',
+    '......kWWWWWkuuuukWWWWWk.......',
+    '......kWWWWWkUnUUkWWWWWk.......',
+    '......kWWWWWkUnUUkWWWWWk.......',
+    '......kWWWWWkUnUUkWWWWWk.......',
+    '......kkkkkkkkkkkkkkkkkkkk......',
+    '................................',
+  ]
+};
+
+// SCHOOL - MOTHER2 style school with yellow walls
+sprites.school = {
+  w: 32, rows: [
+    '................................',
+    '..............kkkk..............',
+    '.............kyyyYk.............',
+    '..............kkkk..............',
+    '...........kxmmmmmxk...........',
+    '..........kxmmmmmmmxk..........',
+    '.........kYYYYYYYYYYYYk........',
+    '........kYYYYYYYYYYYYYYk.......',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkkkk..',
+    '..kYkjjjjkYYYkjjjjkYYYkjjjkk.',
+    '..kYkzjJjkYYYkzjJjkYYYkzjJkk.',
+    '..kYkjjjjkYYYkjjjjkYYYkjjjkk.',
+    '..kYkkkkkkkYYYkkkkkkkYYkkkkkk.',
+    '..kYYYYYYYYYYYYYYYYYYYYYYYYk..',
+    '..kYkjjjjkYYYkjjjjkYYYkjjjkk.',
+    '..kYkzjJjkYYYkzjJjkYYYkzjJkk.',
+    '..kYkjjjjkYYYkjjjjkYYYkjjjkk.',
+    '..kYkkkkkkkYYYkkkkkkkYYkkkkkk.',
+    '..kYYYYYYYYkuuuuuukYYYYYYYYk..',
+    '..kYYYYYYYYkUNnnNUkYYYYYYYYk..',
+    '..kYYYYYYYYkUNnnNUkYYYYYYYYk..',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkkkk..',
+    '................................',
+  ]
+};
+
+// SHOP - colorful awning MOTHER2 style
+sprites.shop = {
+  w: 32, rows: [
+    '................................',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkkk...',
+    '..krrkoorrkoorrkoorrkoorrkk...',
+    '..krrkoorrkoorrkoorrkoorrk....',
+    '..kkRkOOkRRkOOkRRkOOkRRkkk...',
+    '...kkkkkkkkkkkkkkkkkkkkkkk....',
+    '..klllllllllllllllllllllllk....',
+    '..klkkkkkkkkkkkkkkkkkkkkllk...',
+    '..klkgkpkckykgkpkckyklkllk...',
+    '..klkgkpkckykgkpkckyklkllk...',
+    '..klkgkpkckykgkpkckyklkllk...',
+    '..klkkkkkkkkkkkkkkkkkkkkllk...',
+    '..klllllllllllllllllllllllk...',
+    '..klllllllllkuuuuklllllllk....',
+    '..klllllllllkUnUUkllllllk.....',
+    '..klllllllllkUnUUklllllk......',
+    '..kkkkkkkkkkkkkkkkkkkkkk......',
+    '................................',
+  ]
+};
+
+// STOCK EXCHANGE - modern building with ticker
+sprites.stock = {
+  w: 32, rows: [
+    '................................',
+    '...............kkkk.............',
+    '..............kqQqQk............',
+    '.............kqQqQqQk...........',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkkk....',
+    '..kqQqQqQqQqQqQqQqQqQqQqk.....',
+    '..kQqQqQqQqQqQqQqQqQqQqQk.....',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkk.....',
+    '..kxkjjjjkxkjjjjkxkjjjjkxk....',
+    '..kxkzjJjkxkzjJjkxkzjJjkxk....',
+    '..kxkjjjjkxkjjjjkxkjjjjkxk....',
+    '..kxkkkkkkkxkkkkkkkxkkkkkkkk....',
+    '..kxxxxxxxxxxxxxxxxxxxxxkxk.....',
+    '..kxkjjjjkxkjjjjkxkjjjjkxk....',
+    '..kxkzjJjkxkzjJjkxkzjJjkxk....',
+    '..kxkjjjjkxkjjjjkxkjjjjkxk....',
+    '..kxkkkkkkxkuuuuukxkkkkkkkk.....',
+    '..kxxxxxxxkUxnnxUkxxxxxxxxk.....',
+    '..kxxxxxxxkUxnnxUkxxxxxxxxk.....',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkk.....',
+    '................................',
+  ]
+};
+
+// STATION - train station MOTHER2 style
+sprites.station = {
+  w: 32, rows: [
+    '................................',
+    '......kkkkkkkkkkkkkkkkkk........',
+    '.....kMMMMMMMMMMMMMMMMMMk.......',
+    '....kmmmmmmmmmmmmmmmmmmmk......',
+    '...kMmmmmmmmmmmmmmmmmmmmMk.....',
+    '..kMmmmmmmmmmmmmmmmmmmmmmMk....',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkk.....',
+    '..kWWkkjjjkkWWkWWkkjjjkkWk.....',
+    '..kWWkjzjjkkWWkWWkjzjjkkWk.....',
+    '..kkkkkkkkkkkkkkkkkkkkkkkk......',
+    '..kWWk.....kWWWWk.....kWWk.....',
+    '..kWWk.....kWWWWk.....kWWk.....',
+    '..kWWk.....kWWWWk.....kWWk.....',
+    '..kWWk.....kWWWWk.....kWWk.....',
+    '..kkkkkkkkkkkkkkkkkkkkkkkk......',
+    '..kLnLnLnLnLnLnLnLnLnLnk......',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkk.....',
+    '..kMMMMMMMMMMMMMMMMMMMMMMMk.....',
+    '..kkkkkkkkkkkkkkkkkkkkkkkkk.....',
+    '................................',
+  ]
+};
+
+// ══════════════════════════════════════
+// PLAYER SPRITES (24×32) - Ness-like MOTHER2 boy
+// ══════════════════════════════════════
+
+// PLAYER DOWN
+sprites.player_down = {
+  w: 24, rows: [
+    '........kkkkkk..........',
+    '.......krrrrrrk.........',
+    '......krrrrrrrrk........',
+    '......kRrrrrrRRk........',
+    '.......kkkkkkkkk........',
+    '......ksssssssssk.......',
+    '.....ksssksssksssk......',
+    '.....kskkwBkskwBksk.....',
+    '.....ksskssskskssksk....',
+    '......ksssssssssssk.....',
+    '.......kssseeessk.......',
+    '........kksssskk........',
+    '.......kbbbbbbbk........',
+    '......kbbbybbybbbk......',
+    '......kbbbbbbbbbbbk.....',
+    '.....ksbbbbbbbbbbsbk....',
+    '.....kssbbbbbbbbsskk....',
+    '......kkbbbbbbbbkk......',
+    '.......kBBBBkBBBBk......',
+    '......kkBBBk.kBBBkk.....',
+    '......kBBBkk.kkBBBk.....',
+    '.......kkkk...kkkk......',
+    '......krrrkk.kkrrrk.....',
+    '......kRRRk...kRRRk.....',
+    '.......kkkk...kkkk......',
   ]
 };
 
 // PLAYER UP
 sprites.player_up = {
-  w: 32, rows: [
-    '..........kkkkkkkkkkkk..........',
-    '.........krrrrrrrrrrrrk.........',
-    '........krrrrrrrrrrrrrrk........',
-    '........krrrrrrrrrrrrrrk........',
-    '.......krrrrrrrrrrrrrrrrk.......',
-    '.......kRRRRRRRRRRRRRRRRk......',
-    '.......kkkkkkkkkkkkkkkkkkk......',
-    '......kNNNNNNNNNNNNNNNNNk.....',
-    '.....kkNNNNNNNNNNNNNNNNNkk....',
-    '.....kNNNNNNNNNNNNNNNNNNNk....',
-    '.....kNNNNNNNNNNNNNNNNNNNk....',
-    '.....kNNNNNNNNNNNNNNNNNNNk....',
-    '......kNNNNNNNNNNNNNNNNNk.....',
-    '......kNNNNNNNNNNNNNNNNk......',
-    '.......kNNNNNNNNNNNNNNk........',
-    '.......kkNNNNNNNNNNNNkk........',
-    '........kkNNNNNNNNNNkk.........',
-    '.......kbbbbbbbbbbbbbbk........',
-    '......kbbbybbbbbbbbybbbk.......',
-    '......kbbbybbbbbbbbybbbk.......',
-    '.....kbbbbbbbbbbbbbbbbbk.......',
-    '.....kbbbbbbbbbbbbbbbbbk.......',
-    '....ksbbbbbbbbbbbbbbbbsbk.....',
-    '....kssbbbbbbbbbbbbbbssbk.....',
-    '.....kssbbbbbbbbbbbbbsskk.....',
-    '......kkbbbbbbbbbbbbkk........',
-    '.......kBBBBBkBBBBBBk.........',
-    '.......kBBBBBkkBBBBBk.........',
-    '......kkBBBBk..kBBBBkk........',
-    '......kBBBBkk..kkBBBBk........',
-    '.......kkkkk....kkkkk.........',
-    '......krrrrk....krrrrk........',
-    '......krrrrk....krrrrk........',
-    '......kRRRRk....kRRRRk........',
-    '.......kkkk......kkkk.........',
+  w: 24, rows: [
+    '........kkkkkk..........',
+    '.......krrrrrrk.........',
+    '......krrrrrrrrk........',
+    '......kRrrrrrRRk........',
+    '.......kkkkkkkkk........',
+    '......kNNNNNNNNNk.......',
+    '.....kNNNNNNNNNNNk......',
+    '.....kNNNNNNNNNNNNk.....',
+    '.....kNNNNNNNNNNNNk.....',
+    '......kNNNNNNNNNNk......',
+    '.......kNNNNNNNNk.......',
+    '........kkNNNNkk........',
+    '.......kbbbbbbbk........',
+    '......kbbbybbybbbk......',
+    '......kbbbbbbbbbbbk.....',
+    '.....ksbbbbbbbbbbsbk....',
+    '.....kssbbbbbbbbsskk....',
+    '......kkbbbbbbbbkk......',
+    '.......kBBBBkBBBBk......',
+    '......kkBBBk.kBBBkk.....',
+    '......kBBBkk.kkBBBk.....',
+    '.......kkkk...kkkk......',
+    '......krrrkk.kkrrrk.....',
+    '......kRRRk...kRRRk.....',
+    '.......kkkk...kkkk......',
   ]
 };
 
 // PLAYER LEFT
 sprites.player_left = {
-  w: 32, rows: [
-    '........kkkkkkkkkkkk............',
-    '.......krrrrrrrrrrrrk...........',
-    '......krrrrrrrrrrrrrrk..........',
-    '......krrrrrrrrrrrrrrk..........',
-    '.....krrrrrrrrrrrrrrrrk.........',
-    '.....kRRRRRRRRRRRRRRRRk........',
-    '.....kkkkkkkkkkkkkkkkkkk........',
-    '....kHssssssssssssssskk........',
-    '...kksssssssssssssssk..........',
-    '...kssskkwBksssssssskk.........',
-    '...ksskkwBkksssssssskk.........',
-    '...kssskkwBkssssssssk..........',
-    '....ksssssssssssssskk..........',
-    '....ksssssssssssssk............',
-    '.....kssssssssssskk............',
-    '.....kkssssssssskk..............',
-    '......kkssssssskk...............',
-    '.....kbbbbbbbbbbbbk.............',
-    '....kbbbbybbbbbbbk..............',
-    '....kbbbbybbbbbbbk..............',
-    '...kbbbbbbbbbbbbk...............',
-    '...kbbbbbbbbbbbbk...............',
-    '..ksbbbbbbbbbbbk................',
-    '..kssbbbbbbbbbk.................',
-    '...kssbbbbbbbbk.................',
-    '....kkbbbbbbbkk.................',
-    '.....kBBBBBBkk..................',
-    '.....kBBBBBk....................',
-    '....kkBBBBk.....................',
-    '....kBBBBk......................',
-    '.....kkkk.......................',
-    '....krrrrk......................',
-    '....krrrrk......................',
-    '....kRRRRk......................',
-    '.....kkkk.......................',
+  w: 24, rows: [
+    '......kkkkkk............',
+    '.....krrrrrrk...........',
+    '....krrrrrrrrk..........',
+    '....kRRrrrrrRk..........',
+    '.....kkkkkkkkk..........',
+    '....ksssssssssk.........',
+    '...kkBwkksssksk.........',
+    '...kBwkksssssk..........',
+    '...kksssksssskk.........',
+    '....ksssssssssk.........',
+    '.....ksseesssk..........',
+    '......kksskk............',
+    '.....kbbbbbbbk..........',
+    '....kbbbybbbbk..........',
+    '....kbbbbbbbk...........',
+    '...ksbbbbbbbk...........',
+    '...kssbbbbbk............',
+    '....kkbbbbkk............',
+    '.....kBBBBk.............',
+    '....kkBBBk..............',
+    '....kBBBk...............',
+    '.....kkkk...............',
+    '....krrrk...............',
+    '....kRRRk...............',
+    '.....kkkk...............',
   ]
 };
 
 // PLAYER RIGHT
 sprites.player_right = {
-  w: 32, rows: [
-    '............kkkkkkkkkkkk........',
-    '...........krrrrrrrrrrrrk.......',
-    '..........krrrrrrrrrrrrrrk......',
-    '..........krrrrrrrrrrrrrrk......',
-    '.........krrrrrrrrrrrrrrrrk.....',
-    '........kRRRRRRRRRRRRRRRRk.....',
-    '........kkkkkkkkkkkkkkkkkkk.....',
-    '........kksssssssssssssHk......',
-    '..........ksssssssssssssskk....',
-    '.........kksssssssskBwkksssk...',
-    '.........kksssssssskkBwkkssk...',
-    '..........kssssssssskBwkkssk...',
-    '..........kkssssssssssssskk....',
-    '............kssssssssssskk.....',
-    '............kksssssssssk.......',
-    '..............kkssssssskk......',
-    '...............kksssssskk......',
-    '.............kbbbbbbbbbbbbk....',
-    '..............kbbbbbbbybbbbk...',
-    '..............kbbbbbbbybbbbk...',
-    '...............kbbbbbbbbbbbbk..',
-    '...............kbbbbbbbbbbbbk..',
-    '................kbbbbbbbbbbbsk.',
-    '.................kbbbbbbbbssk..',
-    '.................kbbbbbbbbsskk.',
-    '.................kkbbbbbbbkk...',
-    '..................kkBBBBBBk....',
-    '....................kBBBBBk....',
-    '.....................kBBBBkk...',
-    '......................kBBBBk...',
-    '.......................kkkk....',
-    '......................krrrrk...',
-    '......................krrrrk...',
-    '......................kRRRRk...',
-    '.......................kkkk....',
+  w: 24, rows: [
+    '............kkkkkk......',
+    '...........krrrrrrk.....',
+    '..........krrrrrrrrk....',
+    '..........kRrrrrrRRk....',
+    '...........kkkkkkkkk....',
+    '.........ksssssssssk....',
+    '.........ksksskkwBkk...',
+    '...........kssssskwBk...',
+    '.........kkssssksssk...',
+    '.........kssssssssskk...',
+    '..........ksseesssk.....',
+    '............kksskk......',
+    '..........kbbbbbbbk.....',
+    '..........kbbbbybbbk....',
+    '...........kbbbbbbbk....',
+    '...........kbbbbbbsbk...',
+    '............kbbbbbssk...',
+    '............kkbbbbkk....',
+    '.............kBBBBk.....',
+    '..............kBBBkk....',
+    '...............kBBBk....',
+    '...............kkkk.....',
+    '...............krrrk....',
+    '...............kRRRk....',
+    '...............kkkk.....',
   ]
 };
 
 // ══════════════════════════════════════
-// VEHICLE SPRITES
+// VEHICLE SPRITES - MOTHER2 style
 // ══════════════════════════════════════
 
-// BIKE (28×32)
+// BIKE (20×20)
 sprites.bike = {
-  w: 28, rows: [
-    '............kk..............',
-    '...........knsk.............',
-    '...........knsk.............',
-    '..........knnnnk............',
-    '..........k..knk............',
-    '.........k...k.k...........',
-    '.........k..k..kk..........',
-    '........k..k....kk.........',
-    '.......kkkkk..kkkkkkk......',
-    '......kmmmkkkkkmmmkk.......',
-    '.....kmmmmkkkkmmmmk........',
-    '....kmMmMk....kMmMk........',
-    '...kmmmmk......kmmmmk......',
-    '...kmmmmk......kmmmmk......',
-    '....kmmk........kmmk.......',
-    '.....kk..........kk........',
+  w: 20, rows: [
+    '.........kk.........',
+    '........knsk........',
+    '........knsk........',
+    '.......knnnnk.......',
+    '.......k..knk.......',
+    '......k...k.k.......',
+    '......k..k..kk......',
+    '.....k..k....kk.....',
+    '....kkkkk..kkkkk....',
+    '...kmmmkkkkkmmmk....',
+    '..kmmmmkkkkmmmmk....',
+    '.kmMmMk....kMmMk....',
+    'kmmmmk......kmmmmk..',
+    'kmmmmk......kmmmmk..',
+    '.kmmk........kmmk...',
+    '..kk..........kk....',
   ]
 };
 
-// CAR (32×20)
+// CAR (28×18)
 sprites.car = {
-  w: 32, rows: [
-    '........kkkkkkkkkkkkkk..........',
-    '.......krrrrrrrrrrrrrrk.........',
-    '......krrrrrrrrrrrrrrrrkk.......',
-    '.....kkccckrrrrrrkccckkkk......',
-    '....krrrrrkrrrrrrkrrrrrrkk.....',
-    '...krrrrrrrrrrrrrrrrrrrrrk.....',
-    '..kkrrrrrrrrrrrrrrrrrrrrrkkk...',
-    '.kRRRRRRRRRRRRRRRRRRRRRRRRRk..',
-    '.krrrrrrrrrrrrrrrrrrrrrrrrrrk..',
-    '.krrrrrrrrrrrrrrrrrrrrrrrrrk...',
-    '..kkrrrrrrkkkkkkkkkrrrrrrkkk...',
-    '...kkrrkkk.........kkkrrkk....',
-    '...kmmmmk...........kmmmmk....',
-    '..kmMmMmk...........kmMmMk....',
-    '..kmmmmmmk.........kmmmmmmk...',
-    '...kkkkkkk.........kkkkkkk....',
-  ]
-};
-
-// PLANE (32×28)
-sprites.plane = {
-  w: 32, rows: [
-    '..............kkk...............',
-    '.............kwwwk..............',
-    '.............kwwwk..............',
-    '............kwwwwwk.............',
-    '............kwwcwwk.............',
-    '............kwwcwwk.............',
-    '...........kwwwwwwwk............',
-    '...........kwwwwwwwk............',
-    '..........kwwwwwwwwwk...........',
-    '.........kwwwwwwwwwwwk..........',
-    '.......kkwwwwwwwwwwwwwkk........',
-    '....kkkwwwwwwwwwwwwwwwwwkkk.....',
-    '..kkwwwwwwwwwwwwwwwwwwwwwwkk....',
-    '.kwwwwwwwwwwwwwwwwwwwwwwwwwwk...',
-    'kwwwbwwwwwwwwwwwwwwwwwwbwwwwk...',
-    '.kkkkkwwwwwwwwwwwwwwwwkkkkkk....',
-    '......kwwwwwwwwwwwwwwk..........',
-    '.......kwwwwwwwwwwwwk...........',
-    '........kwwwwwwwwwwk............',
-    '.........kwwbbbbwwk.............',
-    '..........kwbwwbwk..............',
-    '...........kbbbbk...............',
-    '............kkkkk...............',
-  ]
-};
-
-// ROCKET (28×36)
-sprites.rocket = {
   w: 28, rows: [
-    '.............kk.............',
-    '............kwwk............',
-    '...........kwwwwk...........',
-    '...........kwwwwk...........',
-    '..........kwwwwwwk..........',
-    '..........kwwwwwwk..........',
-    '.........kwwwccwwwk.........',
-    '.........kwwwccwwwk.........',
-    '.........kwwwwwwwwk.........',
-    '.........kwwwwwwwwk.........',
-    '........kwwwwwwwwwwk........',
-    '........kwwwwwwwwwwk........',
-    '.......kwwwwwwwwwwwwk.......',
-    '.......kwwwwwwwwwwwwk.......',
-    '......kkwwwwwwwwwwwwkk......',
-    '.....krwwwwwwwwwwwwwwrk.....',
-    '....krrwwwwwwwwwwwwwwrrk....',
-    '...krrwwwwwwwwwwwwwwwwrrk...',
-    '...krkwwwwwwwwwwwwwwwwkrk...',
-    '...krkwwwwwwwwwwwwwwwwkrk...',
-    '..kkrkwwwwwwrrrrrwwwwkrkkk..',
-    '..kkkwwwrrrrrrrrrrrwwwkkk...',
-    '...kkwwrrrrrrrrrrrrrrwwkk...',
-    '....kwwrrrrrrrrrrrrrwwk....',
-    '.....kyoooooooooooooyk.....',
-    '......kyoooooooooooyk......',
-    '.......kyooooooooyk........',
-    '........kyyyyyyyk..........',
-    '.........kkkkkk............',
+    '......kkkkkkkkkkkkkk........',
+    '.....krrrrrrrrrrrrrrk.......',
+    '....krrjjjkrrrrkjjjrrk.....',
+    '...krrrrrrrrrrrrrrrrrrrk....',
+    '..kkrrrrrrrrrrrrrrrrrrrkk...',
+    '.kRRRRRRRRRRRRRRRRRRRRRRk..',
+    '.krrrrrrrrrrrrrrrrrrrrrrrk..',
+    '.krrrrrrrrrrrrrrrrrrrrrrrk..',
+    '..kkrrrrrrkkkkkkkrrrrrrkk...',
+    '...kkrrkkk.......kkkrrkk...',
+    '...kmmmmk.........kmmmmk...',
+    '..kmMmMmk.........kmMmMk...',
+    '..kmmmmmmk.......kmmmmmmk..',
+    '...kkkkkk.........kkkkkk...',
   ]
 };
 
-// ══════════════════════════════════════
-// BUILDING SPRITES (32×32)
-// ══════════════════════════════════════
-
-// HOME
-sprites.home = {
-  w: 32, rows: [
-    '..............nkk...................',
-    '.............nnkkk..................',
-    '............krrrrk.................',
-    '...........krrrrrrk................',
-    '..........krrrrrrrrk...............',
-    '.........krrrrrrrrrrkk.............',
-    '........krrrrrrrrrrrrrkk...........',
-    '.......kRrrrrrrrrrrrrrRkk..........',
-    '......kRRrrrrrrrrrrrrrrRRk.........',
-    '.....kRRRrrrrrrrrrrrrrrRRRk........',
-    '....kRRRRrrrrrrrrrrrrrrRRRRk.......',
-    '...kRRRRRrrrrrrrrrrrrrrRRRRRk......',
-    '..kllllllllllllllllllllllllllk.....',
-    '..klllkbbBBkllllllllkbbBBklllk.....',
-    '..klllkbbBBkllllllllkbbBBklllk.....',
-    '..klllkBBbbkllllllllkBBbbklllk.....',
-    '..klllkBBbbkllllllllkBBbbklllk.....',
-    '..kllllllllllllllllllllllllllk.....',
-    '..kllllllllllllllllllllllllllk.....',
-    '..klllllllllknnnnkllllllllllk.....',
-    '..klllllllllknNNnkllllllllllk.....',
-    '..klllllllllknNNnkllllllllllk.....',
-    '..klllllllllknNNnkllllllllllk.....',
-    '..klllllllllknNNnkllllllllllk.....',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk.....',
+// PLANE (28×22)
+sprites.plane = {
+  w: 28, rows: [
+    '.............kkk............',
+    '............kwwwk...........',
+    '............kwwwk...........',
+    '...........kwwwwwk..........',
+    '...........kwjwjwk..........',
+    '..........kwwwwwwwk.........',
+    '..........kwwwwwwwk.........',
+    '.........kwwwwwwwwwk........',
+    '........kwwwwwwwwwwwk.......',
+    '......kkwwwwwwwwwwwwwkk.....',
+    '...kkkwwwwwwwwwwwwwwwwwkkk..',
+    '.kkwwwwwwwwwwwwwwwwwwwwwwkk.',
+    'kwwwbwwwwwwwwwwwwwwwwbwwwwk.',
+    '.kkkkwwwwwwwwwwwwwwwwkkkkk..',
+    '......kwwwwwwwwwwwwwk.......',
+    '.......kwwwwwwwwwwwk........',
+    '........kwwwwwwwwwk.........',
+    '.........kwwbbbbwk..........',
+    '..........kbbwwbk...........',
+    '...........kbbbbk...........',
+    '............kkkk............',
   ]
 };
 
-// BANK
-sprites.bank = {
-  w: 32, rows: [
-    '..........kkyyyyyykkk...........',
-    '.........kyyyyyyyyyyyyk.........',
-    '........kYYyyyyyyyyYYYYk........',
-    '.......kYYYYYYYYYYYYYYYYk.......',
-    '......kYYYYYYYYYYYYYYYYYYk......',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kwkk..kwkk..kwkk..kwkk..kwk..',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-    '..kWWWWWknnnnkkWWWWWWWWWWWWWk..',
-    '..kWWWWWknNNnkkWWWWWWWWWWWWWk..',
-    '..kWWWWWknNNnkkWWWWWWWWWWWWWk..',
-    '..kWWWWWknNNnkkWWWWWWWWWWWWWk..',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-  ]
-};
-
-// SCHOOL
-sprites.school = {
-  w: 32, rows: [
-    '..............kkkk..............',
-    '.............kyyyYk.............',
-    '.............kyyyYk.............',
-    '..............kkkk..............',
-    '...........kmmmmmmmk...........',
-    '..........kmmmmmmmmmmk.........',
-    '.........kYYYYYYYYYYYYYk........',
-    '........kYYYYYYYYYYYYYYYk.......',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-    '..klkbbBBklllkbbBBklllkbbBBklk..',
-    '..klkbbBBklllkbbBBklllkbbBBklk..',
-    '..klkBBbbklllkBBbbklllkBBbbklk..',
-    '..klkBBbbklllkBBbbklllkBBbbklk..',
-    '..kllllllllllllllllllllllllllk..',
-    '..klkbbBBklllkbbBBklllkbbBBklk..',
-    '..klkbbBBklllkbbBBklllkbbBBklk..',
-    '..klkBBbbklllkBBbbklllkBBbbklk..',
-    '..klkBBbbklllkBBbbklllkBBbbklk..',
-    '..kllllllllllllllllllllllllllk..',
-    '..kllllllllknnnnnnkllllllllllk..',
-    '..kllllllllknNNNNnkllllllllllk..',
-    '..kllllllllknNNNNnkllllllllllk..',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-  ]
-};
-
-// SHOP
-sprites.shop = {
-  w: 32, rows: [
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-    '..kowowowowowowowowowowowowowk..',
-    '..kwowowowowowowowowowowowOWk..',
-    '..kowowowowowowowowowowowowowk..',
-    '..kkOkOkOkOkOkOkOkOkOkOkOkOk..',
-    '..kllllllllllllllllllllllllllk..',
-    '..kllllllllllllllllllllllllllk..',
-    '..klkkkkkkkkkkkkkkkkkkkkkkklk..',
-    '..klkgkgkpkpkckcklkkkkkkknlk..',
-    '..klkgkgkpkpkckcklkkkkkkknlk..',
-    '..klkgkgkpkpkckcklkkkkkkknlk..',
-    '..klkkkkkkkkkkkkkkkkkkkkkkklk..',
-    '..kllllllllllllllllllllllnnlk..',
-    '..kllllllllllllllllllllllnnlk..',
-    '..kllllllllllllllllllllllnnlk..',
-    '..kllllllllllllllllllllllnnlk..',
-    '..kllllllllllllllllllllllnnlk..',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkkk..',
-  ]
-};
-
-// STOCK EXCHANGE
-sprites.stock = {
-  w: 32, rows: [
-    '...............kkkk.............',
-    '................kkk.............',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kcCcCcCcCcCcCcCcCcCcCcCcCk...',
-    '..kcCcCcCcCcCcCcCcCcCcCcCcCk...',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kgkkgkkgkkgkkgkkgkkgkkgkkk...',
-    '..kkgkkgkkgkkgkkgkkgkkgkkgkk...',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kmmmmmmmmmmmmmmmmmmmmmmmmMk..',
-    '..kmmmmmmmmmmmmmmmmmmmmmmmmMk..',
-    '..kmmkbbBBkmmmmmmkbbBBkmmmmk...',
-    '..kmmkbbBBkmmmmmmkbbBBkmmmmk...',
-    '..kmmkBBbbkmmmmmmkBBbbkmmmmk...',
-    '..kmmkBBbbkmmmmmmkBBbbkmmmmk...',
-    '..kmmmmmmmmmmmmmmmmmmmmmmmMk...',
-    '..kmmmmmmknnnnkmmmmmmmmmmMk....',
-    '..kmmmmmmknNNnkmmmmmmmmmmMk....',
-    '..kmmmmmmknNNnkmmmmmmmmmmMk....',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkkk...',
-  ]
-};
-
-// STATION
-sprites.station = {
-  w: 32, rows: [
-    '.......kkkkkkkkkkkkkkkkk........',
-    '.....kkmmmmmmmmmmmmmmmmkkk.....',
-    '....kmmmmmmmmmmmmmmmmmmmmk.....',
-    '...kMmmmmmmmmmmmmmmmmmmmMk....',
-    '..kMmmmmmmmmmmmmmmmmmmmmmMk...',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kWWWWkkwwykkkWWkWWWWWWWWk...',
-    '..kWWWWkyWWkkkkWWkWWWWWWWWk...',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kWWkk....kkWWWkk....kkWWk...',
-    '..kWWk.....kWWWWk.....kWWWk...',
-    '..kWWk.....kWWWWk.....kWWWk...',
-    '..kWWk.....kWWWWk.....kWWWk...',
-    '..kWWk.....kWWWWk.....kWWWk...',
-    '..kWWk.....kWWWWk.....kWWWk...',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kLnLnLnLnLnLnLnLnLnLnLnk...',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkk...',
-    '..kMMMMMMMMMMMMMMMMMMMMMMMk....',
-    '..kkkkkkkkkkkkkkkkkkkkkkkkkk...',
-  ]
-};
-
-// ══════════════════════════════════════
-// TILE SPRITES (16×16)
-// ══════════════════════════════════════
-
-// TREE
-sprites.tree = {
-  w: 16, rows: [
-    '.....kddddDk....',
-    '....kddddddDk...',
-    '...kdddddddDDk..',
-    '..kddddddddDDDk.',
-    '.kdddddddddDDDDk',
-    'kddddDddddddDDDk',
-    'kdddDDdddddDDDDk',
-    '.kdddDddddddDDk.',
-    '..kddddddddDDk..',
-    '...kkddddddkk...',
-    '......kttk......',
-    '......kttk......',
-    '......kTTk......',
-    '......kTTk......',
-    '.....kkTTkk.....',
-    '.....kkkkkk.....',
-  ]
-};
-
-// FLOWER
-sprites.flower = {
-  w: 16, rows: [
-    'gg.rgg.pgggg.rgg',
-    'ggggggggggggggyg',
-    'g.pgggggrg.ggggg',
-    'ggggygggggggrgrg',
-    'ggrggggg.pgggggg',
-    'ggggggyggggggpgg',
-    'g.ggrggggyggg.rg',
-    'ggggggggggggggyg',
-    'gg.pgg.rggggrg.g',
-    'ggggggggggygggyg',
-    'g.rgggygggggg.gg',
-    'gggggggggggrggyg',
-    'ggrg.pgggrgggggg',
-    'ggggygggggggg.pg',
-    'g.ggggggrggyggyg',
-    'ggggrgggggggggyg',
-  ]
-};
-
-// WATER
-sprites.water = {
-  w: 16, rows: [
-    'bbBBbbccbbBBbbcc',
-    'bBBbbBBbbBBbbBBb',
-    'BBbbBBbbcBbbBBbb',
-    'BbbBBbbBBbbBBbbB',
-    'bbBBbbccbbBBbbcc',
-    'bBBbbBBbbBBbbBBb',
-    'BBbbcBbbBBbbBBbb',
-    'BbbBBbbBBbbBBbbB',
-    'bbBBbbccbbBBbbcc',
-    'bBBbbBBbbBBbbBBb',
-    'BBbbBBbbcBbbBBbb',
-    'BbbBBbbBBbbBBbbB',
-    'bbBBbbccbbBBbbcc',
-    'bBBbbBBbbBBbbBBb',
-    'BBbbcBbbBBbbBBbb',
-    'BbbBBbbBBbbBBbbB',
-  ]
-};
-
-// FENCE
-sprites.fence = {
-  w: 16, rows: [
-    '.n...n...n...n..',
-    '.n...n...n...n..',
-    '.n...n...n...n..',
-    'nnnnnnnnnnnnnnnn',
-    '.n...n...n...n..',
-    '.n...n...n...n..',
-    '.n...n...n...n..',
-    'nNnNnNnNnNnNnNnN',
-    '.N...N...N...N..',
-    '.N...N...N...N..',
-    '.N...N...N...N..',
-    'NNNNNNNNNNNNNNNN',
-    '.N...N...N...N..',
-    '.N...N...N...N..',
-    '.N...N...N...N..',
-    'nNnNnNnNnNnNnNnN',
+// ROCKET (24×28)
+sprites.rocket = {
+  w: 24, rows: [
+    '...........kk...........',
+    '..........kwwk..........',
+    '.........kwwwwk.........',
+    '.........kwwwwk.........',
+    '........kwwwwwwk........',
+    '........kwwjwwwk........',
+    '.......kwwwjwwwwk.......',
+    '.......kwwwwwwwwk.......',
+    '......kwwwwwwwwwwk......',
+    '......kwwwwwwwwwwk......',
+    '.....kwwwwwwwwwwwwk.....',
+    '.....kwwwwwwwwwwwwk.....',
+    '....kkwwwwwwwwwwwwkk....',
+    '...krwwwwwwwwwwwwwwrk...',
+    '..krrwwwwwwwwwwwwwwrrk..',
+    '..krkwwwwwwwwwwwwwwkrk..',
+    '..krkwwwwwrrrrrwwwwkrk..',
+    '..kkkwwwrrrrrrrrrwwkkk..',
+    '...kkwwrrrrrrrrrrrrwkk..',
+    '....kwwrrrrrrrrrrrwwk...',
+    '.....kyoooooooooooyk....',
+    '......kyoooooooooyk.....',
+    '.......kyooooooyk.......',
+    '........kyyyyyk.........',
+    '.........kkkkk..........',
   ]
 };
 
 // ══════════════════════════════════════
 // GENERATE ALL PNGs
 // ══════════════════════════════════════
-
 async function generateAll() {
+  let count = 0;
   for (const [name, data] of Object.entries(sprites)) {
     const { w, rows } = data;
-    // Validate row lengths
-    let valid = true;
     rows.forEach((row, i) => {
-      if (row.length !== w) {
-        console.warn(`  WARNING: ${name} row ${i} has ${row.length} chars, expected ${w}`);
-        // Pad or truncate
-        if (row.length < w) rows[i] = row + '.'.repeat(w - row.length);
-        else rows[i] = row.substring(0, w);
-        valid = false;
-      }
+      if (row.length < w) rows[i] = row + '.'.repeat(w - row.length);
+      else if (row.length > w) rows[i] = row.substring(0, w);
     });
-
     const img = makeSprite(rows, w);
     const outPath = path.join(OUT, `${name}.png`);
     await img.writeAsync(outPath);
     console.log(`✓ ${name} (${w}×${rows.length}) → ${outPath}`);
+    count++;
   }
-  console.log('\nDone! All sprites generated.');
+  console.log(`\nDone! ${count} sprites generated.`);
 }
 
 generateAll().catch(console.error);
