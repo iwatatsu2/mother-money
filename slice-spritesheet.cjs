@@ -6,47 +6,39 @@ const SRC = '/Users/iwamototatsuya/Downloads/Gemini_Generated_Image_e2kqq3e2kqq3
 const OUT = path.join(__dirname, 'public', 'sprites');
 fs.mkdirSync(OUT, { recursive: true });
 
-// 2816×1536 sprite sheet layout (Gemini MOTHER2 style)
-// Row 1 (y:10-305): grass, path, water, tree(1st), [tree2], home_s, bank_s, school_s
-// Row 2 (y:320-610): flower, fence, road, sand, [gap], stock_big, station_big
-// Row 3 (y:630-1050): home, bank, school, shop, stock, station
-// Row 4 (y:1080-1500): player×4, bike, car, plane, rocket
-
+// 2816×1536 sprite sheet - coordinates from pixel analysis
 const SPRITES = [
-  // Row 1 - Tiles (~270px each)
-  ['grass',    15,   15,  265, 265],
-  ['path',     295,  15,  265, 265],
-  ['water',    575,  15,  265, 265],
-  ['tree',     860,  10,  230, 300],
+  // Row 1 - Tiles (pixel-analyzed: each ~308px wide at y:22-330)
+  ['grass',    22,   22,  308, 308],
+  ['path',     374,  22,  308, 308],
+  ['water',    726,  22,  308, 308],
+  ['tree',     1431, 23,  306, 320],
 
-  // Row 1 right - small buildings (for reference, using Row 3 large versions instead)
-  // tree2 ~1130,10  home_s ~1430,30  bank_s ~1750,30  school_s ~2050,30
+  // Row 2 - More tiles (y:300-600)
+  ['flower',   22,   300, 309, 400],
+  ['fence',    374,  300, 309, 400],
+  ['road',     727,  300, 306, 400],
+  ['sand',     1078, 300, 308, 400],
 
-  // Row 2 - More tiles
-  ['flower',   15,   330, 265, 265],
-  ['fence',    305,  330, 255, 265],
-  ['road',     580,  330, 265, 265],
-  ['sand',     870,  330, 265, 265],
+  // Row 3 - 6 large buildings (y:650-1100)
+  ['home',     58,   710, 236, 390],
+  ['bank',     375,  710, 306, 390],
+  ['school',   727,  710, 306, 390],
+  ['shop',     1079, 710, 306, 390],
+  ['stock',    1548, 650, 482, 410],
+  ['station',  2252, 650, 424, 410],
 
-  // Row 3 - All 6 large buildings
-  ['home',     20,   690, 400, 400],
-  ['bank',     420,  690, 430, 400],
-  ['school',   860,  680, 440, 410],
-  ['shop',     1320, 680, 440, 410],
-  ['stock',    1760, 680, 360, 410],
-  ['station',  2200, 680, 500, 410],
+  // Row 4 - Characters (start y=1140 to avoid Row 3 artifacts)
+  ['player_down',   70,  1140, 201, 390],
+  ['player_up',    434,  1140, 200, 390],
+  ['player_left',  797,  1140, 177, 390],
+  ['player_right', 1149, 1140, 177, 390],
 
-  // Row 4 - Characters (Ness-like)
-  ['player_down',   10,  1080, 260, 430],
-  ['player_up',    240,  1080, 260, 430],
-  ['player_left',  470,  1080, 260, 430],
-  ['player_right', 680,  1080, 260, 430],
-
-  // Row 4 - Vehicles
-  ['bike',    930,  1130, 310, 380],
-  ['car',     1250, 1160, 370, 330],
-  ['plane',   1660, 1130, 450, 360],
-  ['rocket',  2200, 1060, 320, 450],
+  // Row 4 - Vehicles (pixel-analyzed)
+  ['bike',    1466, 1254, 224, 212],
+  ['car',     1818, 1254, 271, 236],
+  ['plane',   2170, 1219, 236, 259],
+  ['rocket',  2571, 1184, 152, 341],
 ];
 
 // Also need: dark, stone (not in sprite sheet - keep existing)
@@ -65,8 +57,7 @@ async function sliceAll() {
     const cropped = img.clone().crop(cx, cy, cw, ch);
 
     // Remove white/near-white background → transparent
-    // Use flood-fill from corners approach: any pixel connected to corners that is white
-    const WHITE_THRESH = 242;
+    const WHITE_THRESH = 235;
     cropped.scan(0, 0, cropped.getWidth(), cropped.getHeight(), function(px, py, idx) {
       const r = this.bitmap.data[idx + 0];
       const g = this.bitmap.data[idx + 1];
@@ -76,12 +67,24 @@ async function sliceAll() {
       }
     });
 
-    // Auto-crop transparent borders
-    const autoCropped = cropped.autocrop({ tolerance: 0, cropOnlyFrames: false });
+    // Autocrop transparent borders
+    let minX = cw, minY = ch, maxX = 0, maxY = 0;
+    cropped.scan(0, 0, cropped.getWidth(), cropped.getHeight(), function(px, py, idx) {
+      if (this.bitmap.data[idx + 3] > 0) {
+        if (px < minX) minX = px;
+        if (px > maxX) maxX = px;
+        if (py < minY) minY = py;
+        if (py > maxY) maxY = py;
+      }
+    });
+
+    const result = (minX < maxX && minY < maxY)
+      ? cropped.clone().crop(minX, minY, maxX - minX + 1, maxY - minY + 1)
+      : cropped;
 
     const outPath = path.join(OUT, `${name}.png`);
-    await autoCropped.writeAsync(outPath);
-    console.log(`✓ ${name} (${autoCropped.getWidth()}×${autoCropped.getHeight()}) → ${outPath}`);
+    await result.writeAsync(outPath);
+    console.log(`✓ ${name} (${result.getWidth()}×${result.getHeight()}) → ${outPath}`);
   }
 
   console.log(`\nDone! ${SPRITES.length} sprites sliced.`);
