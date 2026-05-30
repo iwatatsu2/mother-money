@@ -9,7 +9,10 @@ import {
   Wallet, GraduationCap, Shield, Flame,
   HelpCircle, CheckCircle, Brain,
   LayoutGrid, Package, HandCoins,
-  ChevronUp, ChevronDown, ChevronLeft, ChevronRight
+  ChevronUp, ChevronDown, ChevronLeft, ChevronRight,
+  Cpu, Building2, Umbrella, Fuel, Palmtree, Bitcoin,
+  Target, TrendingDown, Sprout, CircleDollarSign,
+  Filter, ListOrdered, PieChart, Award, Lock
 } from 'lucide-react';
 
 // ══════════════════════════════════════
@@ -123,7 +126,7 @@ const TOWNS = [
       { type: 'stock', x: 5, y: 6, emoji: '📈', name: 'しょうけん' },
       { type: 'station', x: 8, y: 6, emoji: '🚉', name: 'えき' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet'],
+    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'bank_s'],
     shopItems: ['toy1', 'toy2', 'toy3', 'toy4', 'food1', 'food2', 'int6', 'car1'],
     rewardMult: 1, unlockReq: null,
   },
@@ -136,7 +139,7 @@ const TOWNS = [
       { type: 'home', x: 6, y: 5, emoji: '🏠', name: 'マンション' },
       { type: 'station', x: 8, y: 5, emoji: '🚉', name: 'シティえき' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game'],
+    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'bank_s', 'insure', 'energy'],
     shopItems: ['toy1', 'toy2', 'toy3', 'food1', 'food2', 'int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2'],
     rewardMult: 2, unlockReq: { asset: 3000, vehicle: 'bike' },
   },
@@ -149,7 +152,7 @@ const TOWNS = [
       { type: 'home', x: 9, y: 3, emoji: '🏠', name: 'タワマン' },
       { type: 'station', x: 9, y: 5, emoji: '🚉', name: 'メトロえき' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo'],
+    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'energy', 'resort'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'house1', 'house2', 'land1'],
     rewardMult: 3, unlockReq: { asset: 15000, vehicle: 'car' },
   },
@@ -162,7 +165,7 @@ const TOWNS = [
       { type: 'home', x: 3, y: 3, emoji: '🏠', name: 'ペントハウス' },
       { type: 'station', x: 8, y: 6, emoji: '🚉', name: 'くうこう' },
     ],
-    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'space'],
+    startPos: { x: 5, y: 4 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'space', 'energy', 'resort', 'crypto'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'car4', 'house1', 'house2', 'house3', 'land1', 'land2', 'land3'],
     rewardMult: 5, unlockReq: { asset: 50000, vehicle: 'plane' },
   },
@@ -214,13 +217,75 @@ const PAPA_CALLS = [
   { threshold: 100000, msg: "パパだよ。10まんMM…！！\nもう何も教えることがないよ。\nほこりにおもう。", gift: 10000 },
 ];
 
+// Sectors
+const SECTORS = {
+  life: { name: '生活', color: '#4ADE80', icon: '🛒' },
+  tech: { name: 'テック', color: '#818CF8', icon: '💻' },
+  finance: { name: '金融', color: '#FBBF24', icon: '🏦' },
+  frontier: { name: 'フロンティア', color: '#F87171', icon: '🚀' },
+};
+
 const ALL_STOCKS = [
-  { id: 'candy', name: 'おかしカンパニー', price: 100, history: [95, 98, 100], trend: 0.015, vol: 0.06, icon: IceCream, color: '#FF69B4', desc: 'あんてい', dividend: 0.01 },
-  { id: 'fish', name: 'おさかなマート', price: 80, history: [78, 79, 80], trend: 0.008, vol: 0.04, icon: Fish, color: '#4169E1', desc: 'はじめて向け', dividend: 0.015 },
-  { id: 'pet', name: 'どうぶつえん', price: 150, history: [145, 148, 150], trend: 0.01, vol: 0.05, icon: Dog, color: '#DEB887', desc: 'はいとう高い', dividend: 0.02 },
-  { id: 'game', name: 'ゲームファクトリー', price: 250, history: [240, 245, 250], trend: 0.025, vol: 0.10, icon: Gamepad2, color: '#7B68EE', desc: 'せいちょう', dividend: 0.005 },
-  { id: 'robo', name: 'ロボットラボ', price: 500, history: [480, 490, 500], trend: 0.035, vol: 0.14, icon: Zap, color: '#00CED1', desc: 'ハイリスク', dividend: 0 },
-  { id: 'space', name: 'うちゅうぼうけん', price: 1000, history: [950, 970, 1000], trend: 0.045, vol: 0.20, icon: Rocket, color: '#FF6347', desc: 'ゆめかぶ', dividend: 0 },
+  // 生活（ディフェンシブ）
+  { id: 'candy', name: 'おかしカンパニー', price: 100, history: [95, 98, 100], trend: 0.012, vol: 0.05, icon: IceCream, color: '#FF69B4', desc: 'あんてい', dividend: 0.012, sector: 'life', beta: 0.6 },
+  { id: 'fish', name: 'おさかなマート', price: 80, history: [78, 79, 80], trend: 0.008, vol: 0.04, icon: Fish, color: '#4169E1', desc: 'はじめて向け', dividend: 0.018, sector: 'life', beta: 0.5 },
+  { id: 'pet', name: 'どうぶつえん', price: 150, history: [145, 148, 150], trend: 0.01, vol: 0.05, icon: Dog, color: '#DEB887', desc: 'はいとう高い', dividend: 0.025, sector: 'life', beta: 0.7 },
+  // テック
+  { id: 'game', name: 'ゲームファクトリー', price: 250, history: [240, 245, 250], trend: 0.025, vol: 0.10, icon: Gamepad2, color: '#7B68EE', desc: 'せいちょう', dividend: 0.005, sector: 'tech', beta: 1.3 },
+  { id: 'robo', name: 'ロボットラボ', price: 500, history: [480, 490, 500], trend: 0.035, vol: 0.14, icon: Zap, color: '#00CED1', desc: 'ハイリスク', dividend: 0, sector: 'tech', beta: 1.5 },
+  { id: 'ai', name: 'AIラボ', price: 800, history: [750, 770, 800], trend: 0.04, vol: 0.18, icon: Cpu, color: '#A78BFA', desc: 'さいしんぎじゅつ', dividend: 0, sector: 'tech', beta: 1.8 },
+  // 金融
+  { id: 'bank_s', name: 'まちのぎんこう', price: 200, history: [195, 198, 200], trend: 0.01, vol: 0.07, icon: Building2, color: '#FFD700', desc: 'きんゆう', dividend: 0.02, sector: 'finance', beta: 1.0 },
+  { id: 'insure', name: 'ほけんカンパニー', price: 300, history: [290, 295, 300], trend: 0.012, vol: 0.06, icon: Umbrella, color: '#38BDF8', desc: 'あんていはいとう', dividend: 0.022, sector: 'finance', beta: 0.9 },
+  // フロンティア
+  { id: 'space', name: 'うちゅうぼうけん', price: 1000, history: [950, 970, 1000], trend: 0.045, vol: 0.20, icon: Rocket, color: '#FF6347', desc: 'ゆめかぶ', dividend: 0, sector: 'frontier', beta: 2.0 },
+  { id: 'energy', name: 'エネルギーファーム', price: 400, history: [380, 390, 400], trend: 0.02, vol: 0.12, icon: Fuel, color: '#F97316', desc: 'しげんかぶ', dividend: 0.015, sector: 'frontier', beta: 1.4 },
+  { id: 'resort', name: 'しまリゾート', price: 350, history: [340, 345, 350], trend: 0.018, vol: 0.09, icon: Palmtree, color: '#34D399', desc: 'かんこう', dividend: 0.01, sector: 'frontier', beta: 1.2 },
+  { id: 'crypto', name: 'かそうコインしょ', price: 600, history: [550, 570, 600], trend: 0.05, vol: 0.25, icon: Bitcoin, color: '#F59E0B', desc: 'ちょうハイリスク', dividend: 0, sector: 'frontier', beta: 2.5 },
+];
+
+// 景気サイクル
+const ECONOMY_PHASES = [
+  { id: 'expansion', name: 'かくちょう', icon: '📈', color: '#4ADE80', bias: 0.02, volMult: 1.0, sectorBonus: { tech: 0.015, frontier: 0.01 } },
+  { id: 'bubble', name: 'バブル', icon: '🫧', color: '#FBBF24', bias: 0.04, volMult: 1.6, sectorBonus: { tech: 0.03, frontier: 0.025 } },
+  { id: 'recession', name: 'こうたい', icon: '📉', color: '#F87171', bias: -0.025, volMult: 1.3, sectorBonus: { life: 0.015, finance: -0.02 } },
+  { id: 'recovery', name: 'かいふく', icon: '🌱', color: '#38BDF8', bias: 0.01, volMult: 0.8, sectorBonus: { life: 0.01, finance: 0.015 } },
+];
+
+// 大型イベント
+const MAJOR_EVENTS = [
+  { id: 'lehman', name: 'リーマンショック！', desc: '大きなぎんこうがつぶれた！\nせかいじゅうがパニック！', icon: '💥', duration: 8, effects: { ALL: -0.06, finance: -0.12 }, phase: 'recession' },
+  { id: 'ai_bubble', name: 'AIバブル到来！', desc: 'AIがすごすぎる！\nテックかぶがばくあがり！', icon: '🤖', duration: 10, effects: { tech: 0.08, ALL: 0.02 }, phase: 'bubble', aftermath: { tech: -0.10, ALL: -0.03, delay: 6 } },
+  { id: 'pandemic', name: 'パンデミック発生！', desc: 'せかいじゅうでびょうきが\nひろがった…', icon: '🦠', duration: 12, effects: { life: -0.04, tech: 0.05, frontier: -0.06 }, phase: 'recession' },
+  { id: 'crypto_boom', name: 'かそうつうかバブル！', desc: 'かそうコインのかかくが\nばくはつてきにあがった！', icon: '🪙', duration: 6, effects: { frontier: 0.10 }, targetStock: 'crypto', targetEffect: 0.15, aftermath: { frontier: -0.08, delay: 4 } },
+  { id: 'war', name: 'せんそうリスク！', desc: 'せかいがきんちょう…\nエネルギーかかくがきゅうとう！', icon: '⚔️', duration: 8, effects: { ALL: -0.04, frontier: 0.03 }, targetStock: 'energy', targetEffect: 0.10 },
+  { id: 'easing', name: 'きんゆうかんわ！', desc: 'ちゅうおうぎんこうが\nおかねをたくさんだした！', icon: '💰', duration: 6, effects: { ALL: 0.03, finance: 0.05 }, phase: 'expansion' },
+  { id: 'earthquake', name: 'だいじしん発生！', desc: 'おおきなじしんがおきた…\nでもみんなでふっこう！', icon: '🌊', duration: 10, effects: { ALL: -0.05 }, aftermath: { ALL: 0.04, delay: 5 } },
+  { id: 'expo', name: 'ばんぱくかいさい！', desc: 'せかいのおまつりがはじまった！\nかんこうきゃくがたくさん！', icon: '🎪', duration: 8, effects: { ALL: 0.02, frontier: 0.04 }, targetStock: 'resort', targetEffect: 0.08 },
+];
+
+// 実績
+const ACHIEVEMENTS = [
+  { id: 'first_stock', name: 'はじめてのかぶ', desc: 'はじめてかぶをかった', reward: 50, icon: '📈' },
+  { id: 'diversify', name: 'ぶんさんとうし', desc: '3セクターにとうし', reward: 200, icon: '🎯' },
+  { id: 'hold50', name: 'バイ&ホールド', desc: 'おなじかぶを50ターンもった', reward: 500, icon: '💎' },
+  { id: 'tenbagger', name: 'テンバガー', desc: '1銘柄で10ばいのりえき', reward: 2000, icon: '🔥' },
+  { id: 'crash_survivor', name: 'ぼうらくサバイバー', desc: 'ぼうらくでもうらなかった', reward: 1000, icon: '🛡️' },
+  { id: 'asset_100k', name: '10まんMMたっせい', desc: 'そうしさん10まんMM', reward: 3000, icon: '💰' },
+  { id: 'asset_500k', name: '50まんMMたっせい', desc: 'そうしさん50まんMM', reward: 10000, icon: '👑' },
+  { id: 'interest_1k', name: 'ふくりのちから', desc: 'りしだけで1000MMかせいだ', reward: 500, icon: '🏦' },
+  { id: 'dividend_5k', name: 'はいとう生活', desc: 'はいとうだけで5000MMかせいだ', reward: 1500, icon: '💵' },
+  { id: 'quiz_master', name: 'クイズマスター', desc: 'クイズぜんもんせいかい', reward: 1000, icon: '🧠' },
+  { id: 'all_towns', name: 'ぜんぶのまち', desc: '4つのまちをかいほう', reward: 2000, icon: '🗺️' },
+  { id: 'castle', name: 'おしろオーナー', desc: 'おしろをかった', reward: 5000, icon: '🏰' },
+  { id: 'short_master', name: 'からうりマスター', desc: 'からうりで1000MMかせいだ', reward: 1000, icon: '📉' },
+  { id: 'limit_sniper', name: 'さしねスナイパー', desc: 'さしねちゅうもん10かいやくじょう', reward: 800, icon: '🎯' },
+  { id: 'all_vehicles', name: 'ぜんのりもの', desc: 'すべてののりものをかった', reward: 1500, icon: '🚀' },
+  { id: 'room_complete', name: 'マイルームかんせい', desc: 'マイルームをぜんぶうめた', reward: 1000, icon: '🏠' },
+  { id: 'first_short', name: 'はじめてのからうり', desc: 'はじめてからうりした', reward: 100, icon: '📊' },
+  { id: 'monthly_plus', name: 'げつかんプラス', desc: 'げつかんレポートでプラス', reward: 300, icon: '📋' },
+  { id: 'all_sectors', name: 'ぜんセクターせいは', desc: '4セクターすべてにとうし', reward: 500, icon: '🌐' },
+  { id: 'big_trade', name: 'ビッグトレード', desc: '1かいで10000MM以上のとりひき', reward: 1000, icon: '💎' },
 ];
 
 const ALL_SHOP_ITEMS = [
@@ -306,6 +371,37 @@ export default function MotherMoneyGame() {
   const [notification, setNotification] = useState(null);
   const [homeTab, setHomeTab] = useState('status');
 
+  // 景気サイクル
+  const [econPhase, setEconPhase] = useState(0); // index into ECONOMY_PHASES
+  const [phaseTimer, setPhaseTimer] = useState(25); // turns until next phase
+  // 大型イベント
+  const [activeEvent, setActiveEvent] = useState(null); // { ...event, remaining }
+  const [eventModal, setEventModal] = useState(null); // event to show in modal
+  const [eventHistory, setEventHistory] = useState([]);
+  const [usedEvents, setUsedEvents] = useState(new Set());
+  // 指値注文
+  const [limitOrders, setLimitOrders] = useState([]); // [{ id, stockId, type:'buy'|'sell', price, qty, created }]
+  const [limitFills, setLimitFills] = useState(0);
+  // 空売り
+  const [shortPositions, setShortPositions] = useState({}); // { stockId: { qty, entryPrice } }
+  const [totalShortProfit, setTotalShortProfit] = useState(0);
+  // 実績
+  const [achievements, setAchievements] = useState(new Set());
+  // 月次レポート
+  const [monthlyReport, setMonthlyReport] = useState(null);
+  const [lastMonthAssets, setLastMonthAssets] = useState(300);
+  // 統計
+  const [totalInterestEarned, setTotalInterestEarned] = useState(0);
+  const [totalDividendEarned, setTotalDividendEarned] = useState(0);
+  const [holdTurns, setHoldTurns] = useState({}); // { stockId: turnsHeld }
+  const [hadCrash, setHadCrash] = useState(false); // survived crash tracking
+  const [soldDuringCrash, setSoldDuringCrash] = useState(false);
+  // 難易度
+  const [difficulty, setDifficulty] = useState(null); // null = title screen
+  // 証券タブ
+  const [stockTab, setStockTab] = useState('list'); // 'list'|'orders'|'analysis'
+  const [sectorFilter, setSectorFilter] = useState('all');
+
   // Derived
   const town = TOWNS[currentTown];
   const vehicle = useMemo(() => {
@@ -362,32 +458,135 @@ export default function MotherMoneyGame() {
     return () => window.removeEventListener('keydown', h);
   }, [movePlayer, activeBuilding, papaCall, handleInteract]);
 
-  // Market tick
+  // Market tick (景気サイクル + セクター連動 + 大型イベント + 指値約定)
   useEffect(() => {
+    if (difficulty === null) return;
+    const diffMult = difficulty === 'hard' ? 1.5 : difficulty === 'easy' ? 0.6 : 1;
     const iv = setInterval(() => {
       setTurn(t => t + 1);
+
+      // 景気サイクル進行
+      setPhaseTimer(pt => {
+        if (pt <= 1) {
+          setEconPhase(p => (p + 1) % ECONOMY_PHASES.length);
+          return 20 + Math.floor(Math.random() * 20);
+        }
+        return pt - 1;
+      });
+
+      // 大型イベント発火チェック
+      const eventChance = difficulty === 'hard' ? 0.035 : 0.02;
+      setActiveEvent(prev => {
+        if (prev && prev.remaining > 1) return { ...prev, remaining: prev.remaining - 1 };
+        if (prev && prev.remaining <= 1 && prev.aftermath && !prev.inAftermath) {
+          return { ...prev, remaining: prev.aftermath.delay, inAftermath: true, effects: prev.aftermath };
+        }
+        if (prev && prev.remaining <= 1) {
+          setHadCrash(false);
+          return null;
+        }
+        if (Math.random() < eventChance) {
+          const available = MAJOR_EVENTS.filter(e => !usedEvents.has(e.id));
+          if (available.length > 0) {
+            const ev = available[Math.floor(Math.random() * available.length)];
+            setUsedEvents(p => new Set([...p, ev.id]));
+            setEventHistory(h => [...h, { ...ev, turn }]);
+            setEventModal(ev);
+            if (ev.phase === 'recession') { setHadCrash(true); setSoldDuringCrash(false); }
+            return { ...ev, remaining: ev.duration };
+          }
+        }
+        return prev;
+      });
+
+      // ニュース
       const hasNews = Math.random() < 0.12;
       let news = null;
       if (hasNews) { news = NEWS_POOL[Math.floor(Math.random() * NEWS_POOL.length)]; setCurrentNews(news); }
-      setStocks(prev => prev.map(s => {
-        let ch = s.trend + (Math.random() - 0.48) * s.vol;
-        if (news && (news.affects === 'ALL' || news.affects === s.id)) ch += news.impact;
-        return { ...s, price: Math.max(10, Math.round(s.price * (1 + ch))), history: [...s.history.slice(-29), Math.max(10, Math.round(s.price * (1 + ch)))] };
-      }));
-      setBank(p => p > 0 ? Math.floor(p * 1.003) : p);
+
+      // 株価更新（景気+セクター+イベント）
+      setStocks(prev => {
+        const phase = ECONOMY_PHASES[econPhase];
+        return prev.map(s => {
+          let ch = s.trend + (Math.random() - 0.48) * s.vol * (phase.volMult || 1) * diffMult;
+          // 景気バイアス（betaで感応度調整）
+          ch += (phase.bias || 0) * (s.beta || 1);
+          // セクターボーナス
+          if (phase.sectorBonus && phase.sectorBonus[s.sector]) ch += phase.sectorBonus[s.sector];
+          // ニュース
+          if (news && (news.affects === 'ALL' || news.affects === s.id)) ch += news.impact;
+          // 大型イベント
+          if (activeEvent) {
+            const eff = activeEvent.effects || {};
+            if (eff.ALL) ch += eff.ALL;
+            if (eff[s.sector]) ch += eff[s.sector];
+            if (activeEvent.targetStock === s.id && activeEvent.targetEffect) ch += activeEvent.targetEffect;
+          }
+          const newPrice = Math.max(5, Math.round(s.price * (1 + ch)));
+          return { ...s, price: newPrice, history: [...s.history.slice(-99), newPrice] };
+        });
+      });
+
+      // 銀行利息
+      setBank(p => {
+        if (p > 0) {
+          const interest = Math.floor(p * 0.003);
+          if (interest > 0) setTotalInterestEarned(t => t + interest);
+          return p + interest;
+        }
+        return p;
+      });
       setTrustFund(p => p <= 0 ? p : Math.max(0, Math.floor(p * (1 + 0.015 + (Math.random() - 0.45) * 0.025))));
+
+      // 指値注文の約定チェック
+      setLimitOrders(prev => {
+        const remaining = [];
+        for (const order of prev) {
+          const st = stocks.find(s => s.id === order.stockId);
+          if (!st) { remaining.push(order); continue; }
+          if (order.type === 'buy' && st.price <= order.price) {
+            const cost = st.price * order.qty;
+            setWallet(w => { if (w >= cost) { setPortfolio(p => ({ ...p, [order.stockId]: (p[order.stockId] || 0) + order.qty })); setLimitFills(f => f + 1); notify(`📋 さしね約定！ ${st.name} ${order.qty}かぶ かった`, 'success'); return w - cost; } remaining.push(order); return w; });
+          } else if (order.type === 'sell' && st.price >= order.price) {
+            const owned = portfolio[order.stockId] || 0;
+            const q = Math.min(order.qty, owned);
+            if (q > 0) { const rev = st.price * q; setWallet(w => w + rev); setPortfolio(p => ({ ...p, [order.stockId]: (p[order.stockId] || 0) - q })); setLimitFills(f => f + 1); notify(`📋 さしね約定！ ${st.name} ${q}かぶ うった`, 'success'); }
+          } else { remaining.push(order); }
+        }
+        return remaining;
+      });
+
+      // 保有ターンカウント
+      setHoldTurns(prev => {
+        const n = { ...prev };
+        for (const [sid, qty] of Object.entries(portfolio)) { if (qty > 0) n[sid] = (n[sid] || 0) + 1; }
+        return n;
+      });
     }, 3000);
     return () => clearInterval(iv);
-  }, []);
+  }, [difficulty, econPhase, activeEvent, portfolio, stocks, usedEvents]);
 
-  // Dividends
+  // Dividends (毎40ターン = 月末)
   useEffect(() => {
-    if (turn > 1 && turn % 10 === 0) {
+    if (turn > 1 && turn % 40 === 0) {
       let d = 0;
-      stocks.forEach(s => { const q = portfolio[s.id] || 0; if (q > 0 && s.dividend > 0) d += Math.floor(s.price * q * s.dividend); });
-      if (d > 0) { setWallet(w => w + d); setTotalEarned(t => t + d); notify(`💰 はいとう +${d.toLocaleString()}MM！`, 'success'); }
+      stocks.forEach(s => { const q = portfolio[s.id] || 0; if (q > 0 && s.dividend > 0) d += Math.floor(s.price * q * s.dividend * 4); });
+      if (d > 0) { setWallet(w => w + d); setTotalEarned(t => t + d); setTotalDividendEarned(t => t + d); notify(`💰 げつまつはいとう +${d.toLocaleString()}MM！`, 'success'); }
+      // 月次レポート
+      const diff = totalAssets - lastMonthAssets;
+      setMonthlyReport({ assets: totalAssets, diff, turn });
+      setLastMonthAssets(totalAssets);
     }
   }, [turn]);
+
+  // 空売りの含み損益計算
+  const shortPnL = useMemo(() => {
+    let total = 0;
+    for (const [sid, pos] of Object.entries(shortPositions)) {
+      if (pos.qty > 0) { const st = stocks.find(s => s.id === sid); if (st) total += (pos.entryPrice - st.price) * pos.qty; }
+    }
+    return total;
+  }, [shortPositions, stocks]);
 
   // Papa
   useEffect(() => {
@@ -457,6 +656,8 @@ export default function MotherMoneyGame() {
     setWallet(w => w - cost); setPortfolio(p => ({ ...p, [sid]: oq + qty }));
     setAvgCost(p => ({ ...p, [sid]: (oq + qty) > 0 ? (oa * oq + cost) / (oq + qty) : st.price }));
     notify(`${st.name} ${qty}かぶ かった！`);
+    if (cost >= 10000) unlockAch('big_trade');
+    unlockAch('first_stock');
   };
   const handleSellStock = (sid, qty) => {
     const st = stocks.find(s => s.id === sid); const owned = portfolio[sid] || 0;
@@ -464,8 +665,96 @@ export default function MotherMoneyGame() {
     const rev = st.price * q; const profit = rev - (avgCost[sid] || st.price) * q;
     setWallet(w => w + rev); setPortfolio(p => ({ ...p, [sid]: p[sid] - q }));
     if (profit > 0) setTotalStockProfit(t => t + profit);
+    if (rev >= 10000) unlockAch('big_trade');
+    if (hadCrash) setSoldDuringCrash(true);
     notify(`${st.name} ${q}かぶ うった！ ${profit >= 0 ? '+' : ''}${Math.floor(profit)}`, profit >= 0 ? 'success' : 'error');
   };
+
+  // 空売り
+  const handleShortSell = (sid, qty) => {
+    if (currentTown < 2) { notify('おおえどメトロ以降でかいほう！', 'error'); return; }
+    const st = stocks.find(s => s.id === sid); const margin = st.price * qty;
+    if (wallet < margin) { notify('しょうこきん（たんぽ）がたりない！', 'error'); return; }
+    setWallet(w => w - margin);
+    setShortPositions(p => {
+      const prev = p[sid] || { qty: 0, entryPrice: 0 };
+      const newQty = prev.qty + qty;
+      const newEntry = newQty > 0 ? (prev.entryPrice * prev.qty + st.price * qty) / newQty : st.price;
+      return { ...p, [sid]: { qty: newQty, entryPrice: newEntry, margin: (prev.margin || 0) + margin } };
+    });
+    unlockAch('first_short');
+    notify(`${st.name} ${qty}かぶ からうり！`, 'success');
+  };
+  const handleCoverShort = (sid) => {
+    const pos = shortPositions[sid]; if (!pos || pos.qty <= 0) return;
+    const st = stocks.find(s => s.id === sid);
+    const pnl = (pos.entryPrice - st.price) * pos.qty;
+    const returned = (pos.margin || pos.entryPrice * pos.qty) + pnl;
+    setWallet(w => w + Math.max(0, returned));
+    if (pnl > 0) setTotalShortProfit(t => t + pnl);
+    setShortPositions(p => { const n = { ...p }; delete n[sid]; return n; });
+    notify(`からうり決済！ ${pnl >= 0 ? '+' : ''}${Math.floor(pnl)}MM`, pnl >= 0 ? 'success' : 'error');
+  };
+
+  // 指値注文
+  const addLimitOrder = (stockId, type, price, qty) => {
+    if (limitOrders.length >= 5) { notify('ちゅうもんは5けんまで！', 'error'); return; }
+    setLimitOrders(p => [...p, { id: Date.now(), stockId, type, price, qty, created: turn }]);
+    notify(`📋 さしね${type === 'buy' ? 'かい' : 'うり'} セット！`, 'success');
+  };
+  const cancelLimitOrder = (id) => { setLimitOrders(p => p.filter(o => o.id !== id)); notify('ちゅうもんキャンセル'); };
+
+  // 実績解放
+  const unlockAch = useCallback((id) => {
+    setAchievements(prev => {
+      if (prev.has(id)) return prev;
+      const ach = ACHIEVEMENTS.find(a => a.id === id);
+      if (ach) {
+        setWallet(w => w + ach.reward);
+        setTotalEarned(t => t + ach.reward);
+        notify(`🏆 じっせき「${ach.name}」たっせい！ +${ach.reward}MM`, 'success');
+      }
+      return new Set([...prev, id]);
+    });
+  }, [notify]);
+
+  // 実績チェック
+  useEffect(() => {
+    // セクター分散
+    const sectors = new Set(Object.entries(portfolio).filter(([, q]) => q > 0).map(([sid]) => ALL_STOCKS.find(s => s.id === sid)?.sector).filter(Boolean));
+    if (sectors.size >= 3) unlockAch('diversify');
+    if (sectors.size >= 4) unlockAch('all_sectors');
+    // 長期保有
+    for (const [, turns] of Object.entries(holdTurns)) { if (turns >= 50) { unlockAch('hold50'); break; } }
+    // テンバガー
+    for (const [sid, q] of Object.entries(portfolio)) {
+      if (q > 0 && avgCost[sid]) { const st = stocks.find(s => s.id === sid); if (st && st.price >= avgCost[sid] * 10) unlockAch('tenbagger'); }
+    }
+    // 資産目標
+    if (totalAssets >= 100000) unlockAch('asset_100k');
+    if (totalAssets >= 500000) unlockAch('asset_500k');
+    // 利息・配当
+    if (totalInterestEarned >= 1000) unlockAch('interest_1k');
+    if (totalDividendEarned >= 5000) unlockAch('dividend_5k');
+    // クイズ
+    if (quizCorrect >= QUIZZES.length) unlockAch('quiz_master');
+    // 街
+    if (unlockedTowns.size >= 4) unlockAch('all_towns');
+    // おしろ
+    if (inventory.some(i => i.id === 'house3')) unlockAch('castle');
+    // のりもの
+    if (['bike', 'car', 'plane', 'rocket'].every(v => inventory.some(i => i.vehicle === v))) unlockAch('all_vehicles');
+    // マイルーム
+    if (roomItems.every(r => r !== null)) unlockAch('room_complete');
+    // 空売り
+    if (totalShortProfit >= 1000) unlockAch('short_master');
+    // 指値
+    if (limitFills >= 10) unlockAch('limit_sniper');
+    // 暴落サバイバー
+    if (hadCrash && !soldDuringCrash && !activeEvent) unlockAch('crash_survivor');
+    // 月次プラス
+    if (monthlyReport && monthlyReport.diff > 0) unlockAch('monthly_plus');
+  }, [turn, totalAssets, portfolio, holdTurns, totalInterestEarned, totalDividendEarned, quizCorrect, unlockedTowns, inventory, roomItems, totalShortProfit, limitFills, hadCrash, soldDuringCrash, activeEvent, monthlyReport, avgCost, stocks, unlockAch]);
 
   const buyItem = (item) => {
     if (wallet < item.price) { notify('お金がたりない！', 'error'); return; }
@@ -484,11 +773,29 @@ export default function MotherMoneyGame() {
     const v = { default: 'border-yellow-400/80 text-yellow-200 hover:bg-gray-700', primary: 'border-cyan-400 text-cyan-200 hover:bg-cyan-900/50', danger: 'border-red-400/80 text-red-300 hover:bg-red-900/30', success: 'border-green-400/80 text-green-300 hover:bg-green-900/30' };
     return <button className={`border-2 bg-gray-800 px-2 py-1 pixel text-xs active:scale-95 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${v[variant] || v.default} ${className}`} {...p}>{children}</button>;
   };
-  const MiniChart = ({ history, color, w = 120, h = 30 }) => {
+  const MiniChart = ({ history, color, w = 160, h = 50 }) => {
     if (history.length < 2) return null;
     const mn = Math.min(...history), mx = Math.max(...history), rg = mx - mn || 1;
-    const pts = history.map((v, i) => `${(i / (history.length - 1)) * w},${h - ((v - mn) / rg) * (h - 4) - 2}`).join(' ');
-    return <svg width={w} height={h}><polyline points={pts} fill="none" stroke={color} strokeWidth="2" /></svg>;
+    const toY = (v) => h - ((v - mn) / rg) * (h - 6) - 3;
+    const toX = (i) => (i / (history.length - 1)) * w;
+    const pts = history.map((v, i) => `${toX(i)},${toY(v)}`).join(' ');
+    // 移動平均
+    const ma = (period) => history.map((_, i) => { if (i < period - 1) return null; const sl = history.slice(i - period + 1, i + 1); return sl.reduce((a, b) => a + b, 0) / period; });
+    const ma5 = ma(5), ma20 = ma(20);
+    const maLine = (arr, col) => { const valid = arr.map((v, i) => v !== null ? `${toX(i)},${toY(v)}` : null).filter(Boolean); return valid.length > 1 ? <polyline points={valid.join(' ')} fill="none" stroke={col} strokeWidth="1" opacity="0.6" /> : null; };
+    return (
+      <div>
+        <svg width={w} height={h}>
+          <polyline points={pts} fill="none" stroke={color} strokeWidth="2" />
+          {maLine(ma5, '#FBBF24')}
+          {maLine(ma20, '#F87171')}
+        </svg>
+        <div className="flex gap-2 text-[9px] text-gray-500">
+          <span>L:{mn}</span><span>H:{mx}</span>
+          <span className="text-yellow-400/60">MA5</span><span className="text-red-400/60">MA20</span>
+        </div>
+      </div>
+    );
   };
   const ProgressBar = ({ value, max, color = '#4ADE80', h = 6 }) => (
     <div className="bg-gray-700 rounded overflow-hidden" style={{ height: h }}><div className="h-full transition-all" style={{ width: `${Math.min(100, (value / max) * 100)}%`, backgroundColor: color }} /></div>
@@ -502,6 +809,32 @@ export default function MotherMoneyGame() {
   // ══════════════════════════════════════
   //  RENDER
   // ══════════════════════════════════════
+  // 難易度選択画面
+  if (difficulty === null) {
+    return (
+      <div className="min-h-screen bg-gray-950 pixel text-white flex flex-col items-center justify-center" style={{ imageRendering: 'pixelated' }}>
+        <style>{CSS}</style>
+        <div className="text-3xl mb-2" style={{ animation: 'float 2s ease-in-out infinite' }}>💰</div>
+        <h1 className="text-cyan-300 text-lg mb-1">MOTHER MONEY</h1>
+        <p className="text-gray-500 text-xs mb-6">〜おかねのぼうけん〜</p>
+        <div className="space-y-2 w-64">
+          {[
+            { id: 'easy', name: 'かんたん', desc: '初期500MM・ゆるい値動き', color: '#4ADE80', wallet: 500 },
+            { id: 'normal', name: 'ふつう', desc: '初期300MM・スタンダード', color: '#38BDF8', wallet: 300 },
+            { id: 'hard', name: 'ハード', desc: '初期100MM・激しい値動き', color: '#F87171', wallet: 100 },
+          ].map(d => (
+            <button key={d.id} className="w-full border-2 bg-gray-800 p-3 pixel cursor-pointer hover:bg-gray-700 active:scale-95 text-left" style={{ borderColor: d.color }}
+              onClick={() => { setDifficulty(d.id); setWallet(d.wallet); setTotalEarned(d.wallet); setLastMonthAssets(d.wallet); }}>
+              <div className="text-sm" style={{ color: d.color }}>{d.name}</div>
+              <div className="text-[10px] text-gray-400">{d.desc}</div>
+            </button>
+          ))}
+        </div>
+        <div className="text-[10px] text-gray-700 mt-8">♪ MOTHER MONEY ♪</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 pixel text-white flex flex-col items-center" style={{ imageRendering: 'pixelated' }}>
       <style>{CSS}</style>
@@ -513,7 +846,8 @@ export default function MotherMoneyGame() {
           <span className="text-xs text-cyan-300">{town.name}</span>
           <span className="text-[10px] px-1 rounded" style={{ color: currentTitle.color, border: `1px solid ${currentTitle.color}44` }}>{currentTitle.title}</span>
         </div>
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-[10px]" style={{ color: ECONOMY_PHASES[econPhase]?.color }}>{ECONOMY_PHASES[econPhase]?.icon}</span>
           <span className="text-yellow-300">{wallet.toLocaleString()}</span>
           <span className="text-green-300/70">{totalAssets.toLocaleString()}</span>
           <span className="text-gray-600">T{turn}</span>
@@ -546,6 +880,27 @@ export default function MotherMoneyGame() {
               <Btn variant="success" onClick={acceptPapaCall}>ありがとう、パパ！</Btn>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* MAJOR EVENT MODAL */}
+      {eventModal && (
+        <div className="fixed inset-0 bg-black/90 z-[95] flex items-center justify-center p-4">
+          <div className="border-4 border-red-400 bg-gray-900 p-4 max-w-sm w-full pixel" style={{ animation: 'shake 0.5s ease-in-out, pop 0.4s ease-out' }}>
+            <div className="text-center text-4xl mb-2" style={{ animation: 'float 1s ease-in-out infinite' }}>{eventModal.icon}</div>
+            <div className="text-center text-red-300 text-sm mb-2 font-bold">{eventModal.name}</div>
+            <div className="bg-gray-800 border-2 border-red-400/40 p-3 mb-3 text-xs whitespace-pre-line text-center">{eventModal.desc}</div>
+            <div className="text-center text-[10px] text-gray-400 mb-2">（{eventModal.duration}ターンえいきょう）</div>
+            <div className="text-center"><Btn variant="danger" onClick={() => setEventModal(null)}>わかった…！</Btn></div>
+          </div>
+        </div>
+      )}
+
+      {/* MONTHLY REPORT POPUP */}
+      {monthlyReport && turn === monthlyReport.turn && (
+        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-[85] bg-gray-900 border-2 border-cyan-400 p-2 pixel text-xs max-w-xs" style={{ animation: 'slideDown 0.3s ease-out' }}>
+          <div className="text-cyan-300 mb-1">📋 げつかんレポート（{Math.floor(turn/40)}月目）</div>
+          <div className={monthlyReport.diff >= 0 ? 'text-green-400' : 'text-red-400'}>{monthlyReport.diff >= 0 ? '📈 +' : '📉 '}{monthlyReport.diff.toLocaleString()} MM</div>
         </div>
       )}
 
@@ -602,40 +957,110 @@ export default function MotherMoneyGame() {
               </div>
             )}
 
-            {/* STOCK */}
-            {activeBuilding === 'stock' && (
+            {/* STOCK - 3タブ制 */}
+            {activeBuilding === 'stock' && (() => {
+              const phase = ECONOMY_PHASES[econPhase];
+              const filteredStocks = sectorFilter === 'all' ? townStocks : townStocks.filter(s => s.sector === sectorFilter);
+              // ポートフォリオ分析
+              const sectorAlloc = {};
+              for (const [sid, q] of Object.entries(portfolio)) {
+                if (q > 0) { const st = stocks.find(s => s.id === sid); if (st) { sectorAlloc[st.sector] = (sectorAlloc[st.sector] || 0) + st.price * q; } }
+              }
+              const totalStockVal = Object.values(sectorAlloc).reduce((a, b) => a + b, 0);
+              const unrealizedPnL = Object.entries(portfolio).reduce((sum, [sid, q]) => {
+                if (q <= 0) return sum; const st = stocks.find(s => s.id === sid); return sum + (st ? (st.price - (avgCost[sid] || st.price)) * q : 0);
+              }, 0);
+              // 集中度チェック
+              const maxConc = totalStockVal > 0 ? Math.max(...Object.values(sectorAlloc)) / totalStockVal : 0;
+              return (
               <div>
-                <h2 className="text-cyan-300 text-sm flex items-center gap-1 mb-2"><TrendingUp size={14} /> {town.buildings.find(b => b.type === 'stock')?.name}</h2>
-                <p className="text-[10px] text-gray-500 mb-2">{townStocks.length}しゅるい｜報酬 ×{mult}</p>
-                <div className="space-y-1.5">
-                  {townStocks.map(st => {
-                    const Icon = st.icon; const prev = st.history.length > 1 ? st.history[st.history.length - 2] : st.price;
-                    const diff = st.price - prev; const pct = prev > 0 ? ((diff / prev) * 100).toFixed(1) : '0';
-                    const owned = portfolio[st.id] || 0; const isOpen = selectedStock === st.id;
-                    return (
-                      <div key={st.id} className={`bg-gray-800/80 border p-2 cursor-pointer ${isOpen ? 'border-cyan-400' : 'border-gray-700 hover:border-gray-500'}`}
-                        onClick={() => { setSelectedStock(isOpen ? null : st.id); setBuyQty(1); }}>
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5"><Icon size={16} style={{ color: st.color }} /><div><div className="text-xs">{st.name} {st.dividend > 0 && <span className="text-green-400 text-[9px]">配当</span>}</div><div className="text-[10px] text-gray-500">{st.desc}{owned > 0 && ` ×${owned}`}</div></div></div>
-                          <div className="text-right"><div className="text-sm" style={{ color: diff > 0 ? '#4ADE80' : diff < 0 ? '#F87171' : '#9CA3AF' }}>{st.price.toLocaleString()}</div><div className="text-[10px]" style={{ color: diff > 0 ? '#4ADE80' : diff < 0 ? '#F87171' : '#6B7280' }}>{diff > 0 ? '+' : ''}{pct}%</div></div>
-                        </div>
-                        {isOpen && (
-                          <div className="mt-2 pt-2 border-t border-gray-700" onClick={e => e.stopPropagation()}>
-                            <MiniChart history={st.history} color={st.color} />
-                            <div className="flex items-center gap-1 mt-1 text-xs">{[1, 5, 10, 50].map(n => <button key={n} className={`px-1.5 py-0.5 border cursor-pointer ${buyQty === n ? 'border-yellow-400 text-yellow-200' : 'border-gray-600 text-gray-500'}`} onClick={() => setBuyQty(n)}>{n}</button>)}</div>
-                            <div className="flex gap-1 mt-1">
-                              <Btn variant="success" onClick={() => handleBuyStock(st.id, buyQty)} disabled={wallet < st.price * buyQty}>かう（{(st.price * buyQty).toLocaleString()}）</Btn>
-                              <Btn variant="danger" onClick={() => handleSellStock(st.id, buyQty)} disabled={owned < buyQty}>うる</Btn>
-                              {owned > 0 && <Btn variant="danger" onClick={() => handleSellStock(st.id, owned)}>ぜんぶ</Btn>}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                <h2 className="text-cyan-300 text-sm flex items-center gap-1 mb-1"><TrendingUp size={14} /> {town.buildings.find(b => b.type === 'stock')?.name}</h2>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] px-1 py-0.5 rounded" style={{ color: phase.color, border: `1px solid ${phase.color}66`, background: `${phase.color}15` }}>{phase.icon} {phase.name}</span>
+                  {activeEvent && <span className="text-[10px] text-red-300 animate-pulse">{activeEvent.icon} {activeEvent.name}</span>}
                 </div>
+                <div className="flex gap-0.5 mb-2">{[{ id: 'list', l: '📈銘柄' }, { id: 'orders', l: '📋注文' }, { id: 'analysis', l: '📊分析' }].map(t => <button key={t.id} className={`text-xs px-2 py-1 border cursor-pointer pixel ${stockTab === t.id ? 'border-yellow-400 text-yellow-200' : 'border-gray-600 text-gray-500'}`} onClick={() => setStockTab(t.id)}>{t.l}</button>)}</div>
+
+                {stockTab === 'list' && (<div>
+                  <div className="flex gap-0.5 mb-1.5 flex-wrap">
+                    <button className={`text-[10px] px-1 py-0.5 border cursor-pointer ${sectorFilter === 'all' ? 'border-cyan-400 text-cyan-300' : 'border-gray-700 text-gray-500'}`} onClick={() => setSectorFilter('all')}>ぜんぶ</button>
+                    {Object.entries(SECTORS).map(([k, v]) => <button key={k} className={`text-[10px] px-1 py-0.5 border cursor-pointer ${sectorFilter === k ? 'border-cyan-400 text-cyan-300' : 'border-gray-700 text-gray-500'}`} onClick={() => setSectorFilter(k)}>{v.icon}{v.name}</button>)}
+                  </div>
+                  <div className="space-y-1.5">
+                    {filteredStocks.map(st => {
+                      const Icon = st.icon; const prev = st.history.length > 1 ? st.history[st.history.length - 2] : st.price;
+                      const diff = st.price - prev; const pct = prev > 0 ? ((diff / prev) * 100).toFixed(1) : '0';
+                      const owned = portfolio[st.id] || 0; const isOpen = selectedStock === st.id;
+                      const shortPos = shortPositions[st.id];
+                      return (
+                        <div key={st.id} className={`bg-gray-800/80 border p-2 cursor-pointer ${isOpen ? 'border-cyan-400' : 'border-gray-700 hover:border-gray-500'}`}
+                          onClick={() => { setSelectedStock(isOpen ? null : st.id); setBuyQty(1); }}>
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5"><Icon size={16} style={{ color: st.color }} /><div><div className="text-xs">{st.name} <span className="text-[9px]" style={{ color: SECTORS[st.sector]?.color }}>{SECTORS[st.sector]?.icon}</span> {st.dividend > 0 && <span className="text-green-400 text-[9px]">配当{(st.dividend*100).toFixed(1)}%</span>}</div><div className="text-[10px] text-gray-500">{st.desc}{owned > 0 && ` ×${owned}`}{shortPos?.qty > 0 && <span className="text-red-400"> 空${shortPos.qty}</span>}</div></div></div>
+                            <div className="text-right"><div className="text-sm" style={{ color: diff > 0 ? '#4ADE80' : diff < 0 ? '#F87171' : '#9CA3AF' }}>{st.price.toLocaleString()}</div><div className="text-[10px]" style={{ color: diff > 0 ? '#4ADE80' : diff < 0 ? '#F87171' : '#6B7280' }}>{diff > 0 ? '+' : ''}{pct}%</div></div>
+                          </div>
+                          {isOpen && (
+                            <div className="mt-2 pt-2 border-t border-gray-700" onClick={e => e.stopPropagation()}>
+                              <MiniChart history={st.history} color={st.color} />
+                              <div className="flex items-center gap-1 mt-1 text-xs">{[1, 5, 10, 50].map(n => <button key={n} className={`px-1.5 py-0.5 border cursor-pointer ${buyQty === n ? 'border-yellow-400 text-yellow-200' : 'border-gray-600 text-gray-500'}`} onClick={() => setBuyQty(n)}>{n}</button>)}</div>
+                              <div className="flex gap-1 mt-1 flex-wrap">
+                                <Btn variant="success" onClick={() => handleBuyStock(st.id, buyQty)} disabled={wallet < st.price * buyQty}>かう（{(st.price * buyQty).toLocaleString()}）</Btn>
+                                <Btn variant="danger" onClick={() => handleSellStock(st.id, buyQty)} disabled={owned < buyQty}>うる</Btn>
+                                {owned > 0 && <Btn variant="danger" onClick={() => handleSellStock(st.id, owned)}>ぜんぶ</Btn>}
+                              </div>
+                              {currentTown >= 2 && <div className="flex gap-1 mt-1">
+                                <Btn onClick={() => handleShortSell(st.id, buyQty)} disabled={wallet < st.price * buyQty}>📉からうり</Btn>
+                                {shortPos?.qty > 0 && <Btn variant="success" onClick={() => handleCoverShort(st.id)}>決済（{Math.floor((shortPos.entryPrice - st.price) * shortPos.qty)}）</Btn>}
+                              </div>}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>)}
+
+                {stockTab === 'orders' && (<div className="space-y-2">
+                  <div className="text-xs text-gray-400">さしねちゅうもん（{limitOrders.length}/5）</div>
+                  {limitOrders.length > 0 ? limitOrders.map(o => {
+                    const st = stocks.find(s => s.id === o.stockId);
+                    return <div key={o.id} className="flex items-center justify-between bg-gray-800 border border-gray-700 p-1.5 text-xs">
+                      <span>{st?.name} {o.type === 'buy' ? '🟢かい' : '🔴うり'} {o.qty}かぶ @{o.price}</span>
+                      <button className="text-red-400 border border-red-400/50 px-1 cursor-pointer text-[10px]" onClick={() => cancelLimitOrder(o.id)}>×</button>
+                    </div>;
+                  }) : <div className="text-xs text-gray-600 text-center py-4">ちゅうもんはありません</div>}
+                  <div className="border-t border-gray-700 pt-2">
+                    <div className="text-xs text-gray-400 mb-1">あたらしいさしね</div>
+                    {selectedStock ? (() => {
+                      const st = stocks.find(s => s.id === selectedStock);
+                      return <div className="space-y-1">
+                        <div className="text-xs">{st?.name}（いまの価格: {st?.price}）</div>
+                        <div className="flex gap-1">
+                          <Btn variant="success" onClick={() => addLimitOrder(selectedStock, 'buy', Math.floor(st.price * 0.9), buyQty)}>{Math.floor(st.price * 0.9)}以下でかう</Btn>
+                          <Btn variant="danger" onClick={() => addLimitOrder(selectedStock, 'sell', Math.floor(st.price * 1.1), buyQty)}>{Math.floor(st.price * 1.1)}以上でうる</Btn>
+                        </div>
+                      </div>;
+                    })() : <div className="text-[10px] text-gray-500">銘柄タブでかぶをえらんでね</div>}
+                  </div>
+                </div>)}
+
+                {stockTab === 'analysis' && (<div className="space-y-2">
+                  <div className="text-xs text-gray-400">ポートフォリオぶんせき</div>
+                  {totalStockVal > 0 ? (<>
+                    <div className="flex h-3 rounded overflow-hidden">{Object.entries(sectorAlloc).map(([sec, val]) => <div key={sec} style={{ width: `${(val / totalStockVal) * 100}%`, backgroundColor: SECTORS[sec]?.color }} title={`${SECTORS[sec]?.name}: ${Math.round((val / totalStockVal) * 100)}%`} />)}</div>
+                    <div className="flex flex-wrap gap-1 text-[10px]">{Object.entries(sectorAlloc).map(([sec, val]) => <span key={sec} style={{ color: SECTORS[sec]?.color }}>{SECTORS[sec]?.icon}{Math.round((val / totalStockVal) * 100)}%</span>)}</div>
+                    {maxConc > 0.5 && <div className="text-xs text-yellow-300 bg-yellow-900/20 border border-yellow-400/30 p-1">⚠️ しゅうちゅうしすぎ！ぶんさんしよう！</div>}
+                    <div className="grid grid-cols-2 gap-1 text-xs">
+                      <div className="bg-gray-800 border border-gray-700 p-1.5"><div className="text-gray-500 text-[10px]">ふくみそんえき</div><div className={unrealizedPnL >= 0 ? 'text-green-400' : 'text-red-400'}>{unrealizedPnL >= 0 ? '+' : ''}{Math.floor(unrealizedPnL).toLocaleString()}</div></div>
+                      <div className="bg-gray-800 border border-gray-700 p-1.5"><div className="text-gray-500 text-[10px]">かくていりえき</div><div className="text-green-300">{Math.floor(totalStockProfit).toLocaleString()}</div></div>
+                      <div className="bg-gray-800 border border-gray-700 p-1.5"><div className="text-gray-500 text-[10px]">からうりそんえき</div><div className={shortPnL >= 0 ? 'text-green-400' : 'text-red-400'}>{Math.floor(shortPnL).toLocaleString()}</div></div>
+                      <div className="bg-gray-800 border border-gray-700 p-1.5"><div className="text-gray-500 text-[10px]">はいとうるいけい</div><div className="text-yellow-300">{totalDividendEarned.toLocaleString()}</div></div>
+                    </div>
+                  </>) : <div className="text-xs text-gray-600 text-center py-4">まだかぶをもっていません</div>}
+                </div>)}
               </div>
-            )}
+              );
+            })()}
 
             {/* SCHOOL */}
             {activeBuilding === 'school' && (
@@ -731,13 +1156,41 @@ export default function MotherMoneyGame() {
 
                 {homeTab === 'achieve' && (
                   <div className="space-y-2">
+                    <div className="text-xs text-gray-400">しょうごう</div>
                     <div className="space-y-0.5">{TITLES.map((t, i) => <div key={i} className="flex items-center gap-1 text-xs"><span className={totalAssets >= t.min ? '' : 'opacity-30'}>{totalAssets >= t.min ? '★' : '☆'}</span><span style={{ color: totalAssets >= t.min ? t.color : '#4B5563' }}>{totalAssets >= t.min ? t.title : '？？？'}</span><span className="text-gray-600 ml-auto">{t.min.toLocaleString()}</span></div>)}</div>
+                    <div className="border-t border-gray-700 pt-2">
+                      <div className="text-xs text-gray-400 mb-1">じっせき（{achievements.size}/{ACHIEVEMENTS.length}）</div>
+                      <div className="grid grid-cols-2 gap-1">
+                        {ACHIEVEMENTS.map(a => {
+                          const done = achievements.has(a.id);
+                          return <div key={a.id} className={`text-[10px] p-1 border ${done ? 'border-yellow-400/50 bg-yellow-900/10' : 'border-gray-700/50 opacity-40'}`}>
+                            <span>{a.icon} {done ? a.name : '？？？'}</span>
+                            {done && <span className="text-yellow-400 ml-1">+{a.reward}</span>}
+                          </div>;
+                        })}
+                      </div>
+                    </div>
+                    {monthlyReport && (
+                      <div className="border-t border-gray-700 pt-2">
+                        <div className="text-xs text-gray-400 mb-1">📋 げつかんレポート</div>
+                        <div className="bg-gray-800 border border-gray-700 p-2 text-xs">
+                          <div>そうしさん: {monthlyReport.assets.toLocaleString()} MM</div>
+                          <div className={monthlyReport.diff >= 0 ? 'text-green-400' : 'text-red-400'}>ぜんげつひ: {monthlyReport.diff >= 0 ? '+' : ''}{monthlyReport.diff.toLocaleString()} MM</div>
+                        </div>
+                      </div>
+                    )}
                     <div className="border-t border-gray-700 pt-2 grid grid-cols-2 gap-1 text-[10px]">
                       <div className="bg-gray-800 p-1 border border-gray-700"><span className="text-gray-500">そうかせぎ</span> <span className="text-yellow-300">{totalEarned.toLocaleString()}</span></div>
                       <div className="bg-gray-800 p-1 border border-gray-700"><span className="text-gray-500">かぶりえき</span> <span className="text-green-300">{Math.floor(totalStockProfit).toLocaleString()}</span></div>
-                      <div className="bg-gray-800 p-1 border border-gray-700"><span className="text-gray-500">もちもの</span> <span className="text-orange-300">{inventory.length}こ</span></div>
-                      <div className="bg-gray-800 p-1 border border-gray-700"><span className="text-gray-500">ターン</span> <span className="text-gray-300">{turn}</span></div>
+                      <div className="bg-gray-800 p-1 border border-gray-700"><span className="text-gray-500">はいとう</span> <span className="text-cyan-300">{totalDividendEarned.toLocaleString()}</span></div>
+                      <div className="bg-gray-800 p-1 border border-gray-700"><span className="text-gray-500">ターン</span> <span className="text-gray-300">{turn}（{Math.floor(turn/40)}月）</span></div>
                     </div>
+                    {eventHistory.length > 0 && (
+                      <div className="border-t border-gray-700 pt-2">
+                        <div className="text-xs text-gray-400 mb-1">📰 イベントれきし</div>
+                        {eventHistory.slice(-5).reverse().map((e, i) => <div key={i} className="text-[10px] text-gray-500">{e.icon} T{e.turn} {e.name}</div>)}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
