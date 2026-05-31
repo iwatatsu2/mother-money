@@ -387,6 +387,53 @@ function buildDoorSprite() {
   ];
 }
 
+function buildPlantSprite() {
+  const L='#389038',Ld='#287028',Ll='#50b050',Lll='#68c868';
+  const P='#a06838',Pd='#805028';
+  return [
+    [_,_,_,Lll,Lll,_,_,_],
+    [_,_,Lll,Ll,Ll,Lll,_,_],
+    [_,Lll,Ll,L,L,Ll,Lll,_],
+    [Lll,L,Ld,L,L,Ld,L,Lll],
+    [_,Ld,L,L,L,L,Ld,_],
+    [_,_,_,Ld,Ld,_,_,_],
+    [_,_,Pd,P,P,Pd,_,_],
+    [_,_,P,P,P,P,_,_],
+  ];
+}
+
+function buildVendingSprite() {
+  const M='#3848a0',Md='#283878',Ml='#4858b0';
+  const G='#1a1a20';
+  const Cn='#e04040',Cn2='#40a040',Cn3='#e0a020',Cn4='#4080d0';
+  const Sl='#c0c0c8';
+  return [
+    [Md,M,Ml,Ml,Ml,Ml,M,Md],
+    [M,G,Cn,Cn2,Cn2,Cn3,G,M],
+    [M,G,Cn,Cn2,Cn2,Cn3,G,M],
+    [M,G,Cn4,Cn,Cn,Cn2,G,M],
+    [M,Ml,Ml,Ml,Ml,Ml,Ml,M],
+    [M,M,M,M,M,M,M,M],
+    [M,Sl,Sl,Sl,Sl,Sl,Sl,M],
+    [Md,Md,_,_,_,_,Md,Md],
+  ];
+}
+
+function buildRugSprite() {
+  const R='#8b4040',Rd='#6b2020',Rl='#ab6060',Rll='#cb8080';
+  const G='#c8a030',Gd='#a88020';
+  return [
+    [Gd,G,G,G,G,G,G,Gd],
+    [G,Rl,R,R,R,R,Rl,G],
+    [G,R,Rd,R,R,Rd,R,G],
+    [G,R,R,Rll,Rll,R,R,G],
+    [G,R,R,Rll,Rll,R,R,G],
+    [G,R,Rd,R,R,Rd,R,G],
+    [G,Rl,R,R,R,R,Rl,G],
+    [Gd,G,G,G,G,G,G,Gd],
+  ];
+}
+
 // ── Buildings ──
 function buildHouse() {
   const O='#282830';
@@ -566,6 +613,9 @@ async function main() {
   await arrayToPng(buildCounterSprite(), 'counter', 10);
   await arrayToPng(buildDeskSprite(), 'desk', 10);
   await arrayToPng(buildDoorSprite(), 'door', 10);
+  await arrayToPng(buildPlantSprite(), 'plant', 10);
+  await arrayToPng(buildVendingSprite(), 'vending', 10);
+  await arrayToPng(buildRugSprite(), 'rug', 10);
 
   // Buildings
   await arrayToPng(buildHouse(), 'home', 8);

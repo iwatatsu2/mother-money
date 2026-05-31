@@ -49,13 +49,13 @@ const PLAYER_IMG = { down: '/sprites/player_down.png', up: '/sprites/player_up.p
 const VEHICLE_IMG = { bike: '/sprites/bike.png', car: '/sprites/car.png', plane: '/sprites/plane.png', rocket: '/sprites/rocket.png' };
 const BLDG_IMG = { home: '/sprites/home.png', bank: '/sprites/bank.png', school: '/sprites/school.png', shop: '/sprites/shop.png', stock: '/sprites/stock.png', station: '/sprites/station.png' };
 const NPC_IMG = { warrior: '/sprites/npc_warrior.png', slime: '/sprites/npc_slime.png', witch: '/sprites/npc_witch.png' };
-const TILE_IMG = { grass: '/sprites/grass.png', path: '/sprites/path.png', water: '/sprites/water.png', tree: '/sprites/tree.png', flower: '/sprites/flower.png', fence: '/sprites/fence.png', road: '/sprites/road.png', sand: '/sprites/sand.png', stone: '/sprites/stone.png', dark: '/sprites/dark.png', floor: '/sprites/floor.png', wall: '/sprites/wall.png', shelf: '/sprites/shelf.png', counter: '/sprites/counter.png', desk: '/sprites/desk.png', door: '/sprites/door.png' };
+const TILE_IMG = { grass: '/sprites/grass.png', path: '/sprites/path.png', water: '/sprites/water.png', tree: '/sprites/tree.png', flower: '/sprites/flower.png', fence: '/sprites/fence.png', road: '/sprites/road.png', sand: '/sprites/sand.png', stone: '/sprites/stone.png', dark: '/sprites/dark.png', floor: '/sprites/floor.png', wall: '/sprites/wall.png', shelf: '/sprites/shelf.png', counter: '/sprites/counter.png', desk: '/sprites/desk.png', door: '/sprites/door.png', plant: '/sprites/plant.png', vending: '/sprites/vending.png', rug: '/sprites/rug.png' };
 
 // ══════════════════════════════════════
 //  Tile types & styles
 // ══════════════════════════════════════
 const T = { GRASS: 0, PATH: 1, WATER: 2, TREE: 3, FLOWER: 4, FENCE: 5, ROAD: 6, SAND: 7, STONE: 8, DARK: 9,
-  FLOOR: 10, WALL: 11, SHELF: 12, COUNTER: 13, DESK: 14, DOOR: 15 };
+  FLOOR: 10, WALL: 11, SHELF: 12, COUNTER: 13, DESK: 14, DOOR: 15, PLANT: 16, VENDING: 17, RUG: 18 };
 const TILE_STYLE = {
   [T.GRASS]:  { bg: '#4a7c3f', img: 'grass' },
   [T.PATH]:   { bg: '#c4a96a', img: 'path' },
@@ -73,74 +73,83 @@ const TILE_STYLE = {
   [T.COUNTER]:{ bg: '#a08868', img: 'counter' },
   [T.DESK]:   { bg: '#b09868', img: 'desk' },
   [T.DOOR]:   { bg: '#9a7a4a', img: 'door' },
+  [T.PLANT]:  { bg: '#c8a868', img: 'plant' },
+  [T.VENDING]:{ bg: '#c8a868', img: 'vending' },
+  [T.RUG]:    { bg: '#8b4040', img: 'rug' },
 };
-const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.DARK, T.FLOOR, T.DOOR]);
+const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.DARK, T.FLOOR, T.DOOR, T.RUG]);
 
 // ══════════════════════════════════════
 //  Interior maps (10×8 each)
 // ══════════════════════════════════════
 const INT_COLS = 10, INT_ROWS = 8;
-const W = T.WALL, F = T.FLOOR, S = T.SHELF, C = T.COUNTER, D = T.DESK, DR = T.DOOR;
+const iW = T.WALL, iF = T.FLOOR, iS = T.SHELF, iC = T.COUNTER, iD = T.DESK, iDR = T.DOOR, iP = T.PLANT, iV = T.VENDING, iR = T.RUG;
 const INTERIOR_MAPS = {
+  // 銀行: カウンター奥に金庫棚、ロビーに観葉植物、ATMコーナー
   bank: [
-    W,W,W,W,W,W,W,W,W,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,C,C,C,C,C,C,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,W,W,W,DR,DR,W,W,W,W,
+    iW,iW,iW,iW,iW,iW,iW,iW,iW,iW,
+    iW,iS,iS,iF,iF,iF,iF,iS,iS,iW,
+    iW,iF,iF,iF,iP,iP,iF,iF,iF,iW,
+    iW,iF,iC,iC,iC,iC,iC,iC,iF,iW,
+    iW,iF,iF,iR,iR,iR,iR,iF,iF,iW,
+    iW,iP,iF,iR,iR,iR,iR,iF,iP,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iV,iW,
+    iW,iW,iW,iW,iDR,iDR,iW,iW,iW,iW,
   ],
+  // 学校: 教壇+机4列、黒板(棚)、本棚、植物
   school: [
-    W,W,W,W,W,W,W,W,W,W,
-    W,S,S,F,F,F,F,S,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,D,D,F,F,D,D,F,W,
-    W,F,D,D,F,F,D,D,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,F,C,C,F,F,F,W,
-    W,W,W,W,DR,DR,W,W,W,W,
+    iW,iW,iW,iW,iW,iW,iW,iW,iW,iW,
+    iW,iS,iS,iS,iS,iS,iS,iS,iS,iW,
+    iW,iF,iF,iF,iC,iC,iF,iF,iF,iW,
+    iW,iF,iD,iF,iF,iF,iF,iD,iF,iW,
+    iW,iF,iD,iF,iF,iF,iF,iD,iF,iW,
+    iW,iF,iD,iF,iF,iF,iF,iD,iF,iW,
+    iW,iP,iF,iF,iF,iF,iF,iF,iP,iW,
+    iW,iW,iW,iW,iDR,iDR,iW,iW,iW,iW,
   ],
+  // ショップ: 商品棚びっしり、中央通路、レジカウンター
   shop: [
-    W,W,W,W,W,W,W,W,W,W,
-    W,S,S,S,F,F,S,S,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,C,C,C,C,F,F,W,
-    W,W,W,W,DR,DR,W,W,W,W,
+    iW,iW,iW,iW,iW,iW,iW,iW,iW,iW,
+    iW,iS,iF,iS,iF,iF,iS,iF,iS,iW,
+    iW,iS,iF,iS,iF,iF,iS,iF,iS,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iS,iF,iS,iF,iF,iS,iF,iS,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iF,iF,iC,iC,iC,iC,iF,iV,iW,
+    iW,iW,iW,iW,iDR,iDR,iW,iW,iW,iW,
   ],
+  // 証券: モニター(机)並び、電光掲示板(棚)、商談カウンター
   stock: [
-    W,W,W,W,W,W,W,W,W,W,
-    W,D,D,F,F,F,F,D,D,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,C,C,C,C,F,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,W,W,W,DR,DR,W,W,W,W,
+    iW,iW,iW,iW,iW,iW,iW,iW,iW,iW,
+    iW,iS,iS,iS,iS,iS,iS,iS,iS,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iD,iF,iD,iF,iF,iD,iF,iD,iW,
+    iW,iF,iF,iF,iR,iR,iF,iF,iF,iW,
+    iW,iF,iF,iC,iC,iC,iC,iF,iF,iW,
+    iW,iP,iF,iF,iF,iF,iF,iF,iP,iW,
+    iW,iW,iW,iW,iDR,iDR,iW,iW,iW,iW,
   ],
+  // 自宅: ベッド(机)、本棚、ラグ、観葉植物、自販機(冷蔵庫)
   home: [
-    W,W,W,W,W,W,W,W,W,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,D,F,F,F,F,D,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,W,W,W,DR,DR,W,W,W,W,
+    iW,iW,iW,iW,iW,iW,iW,iW,iW,iW,
+    iW,iD,iD,iF,iF,iF,iS,iS,iV,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iF,iF,iR,iR,iR,iF,iF,iF,iW,
+    iW,iF,iF,iR,iR,iR,iF,iD,iF,iW,
+    iW,iP,iF,iF,iF,iF,iF,iF,iP,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iW,iW,iW,iDR,iDR,iW,iW,iW,iW,
   ],
+  // 駅: 改札(カウンター)、時刻表(棚)、ベンチ(机)、自販機
   station: [
-    W,W,W,W,W,W,W,W,W,W,
-    W,S,F,F,F,F,F,F,S,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,C,C,C,C,F,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,F,F,F,F,F,F,F,F,W,
-    W,W,W,W,DR,DR,W,W,W,W,
+    iW,iW,iW,iW,iW,iW,iW,iW,iW,iW,
+    iW,iS,iF,iF,iF,iF,iF,iF,iS,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iF,iC,iC,iF,iF,iC,iC,iF,iW,
+    iW,iF,iF,iF,iF,iF,iF,iF,iF,iW,
+    iW,iD,iF,iF,iR,iR,iF,iF,iD,iW,
+    iW,iV,iF,iF,iF,iF,iF,iF,iP,iW,
+    iW,iW,iW,iW,iDR,iDR,iW,iW,iW,iW,
   ],
 };
 
@@ -688,12 +697,16 @@ export default function MotherMoneyGame() {
         setInteriorMode(null);
         return;
       }
-      // Check adjacent tiles for shelf/desk/counter
+      // Check adjacent tiles for door/shelf/desk/counter
       const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
       for (const [ddx, ddy] of dirs) {
         const ax = interiorPos.x + ddx, ay = interiorPos.y + ddy;
         if (ax < 0 || ax >= INT_COLS || ay < 0 || ay >= INT_ROWS) continue;
         const adjTile = intMap[ay * INT_COLS + ax];
+        if (adjTile === T.DOOR) {
+          setInteriorMode(null);
+          return;
+        }
         if (adjTile === T.COUNTER) {
           // Open building UI
           setActiveBuilding(interiorMode.type);
@@ -702,7 +715,7 @@ export default function MotherMoneyGame() {
           setHomeTab('status'); setShopCat('おもちゃ');
           return;
         }
-        if (adjTile === T.SHELF || adjTile === T.DESK) {
+        if (adjTile === T.SHELF || adjTile === T.DESK || adjTile === T.VENDING || adjTile === T.PLANT) {
           const key = `${interiorMode.townId}-${interiorMode.type}-${ax}-${ay}`;
           if (searchedItems.has(key)) {
             notify('もうしらべたよ！');
@@ -1099,7 +1112,7 @@ export default function MotherMoneyGame() {
   const townShopItems = ALL_SHOP_ITEMS.filter(i => town.shopItems.includes(i.id));
   const shopCats = [...new Set(townShopItems.map(i => i.cat))];
   const TILE_SIZE = 40;
-  const mapScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (COLS * TILE_SIZE), window.innerHeight / (ROWS * TILE_SIZE)) : 1;
+  const mapScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (COLS * TILE_SIZE), (window.innerHeight - 48) / (ROWS * TILE_SIZE)) : 1;
 
   // ══════════════════════════════════════
   //  RENDER
@@ -1131,7 +1144,7 @@ export default function MotherMoneyGame() {
   }
 
   return (
-    <div className="h-screen w-screen bg-gray-950 pixel text-white flex flex-col items-center justify-center overflow-hidden relative" style={{ imageRendering: 'pixelated' }}>
+    <div className="h-screen w-screen bg-gray-950 pixel text-white flex flex-col items-center justify-center overflow-hidden relative" style={{ imageRendering: 'pixelated', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
       <style>{CSS}</style>
 
       {/* HEADER (overlay) */}
@@ -1234,7 +1247,7 @@ export default function MotherMoneyGame() {
                   const x = i % INT_COLS, y = Math.floor(i / INT_COLS);
                   const key = `${interiorMode.townId}-${interiorMode.type}-${x}-${y}`;
                   const searched = searchedItems.has(key);
-                  return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg, opacity: (tile === T.SHELF || tile === T.DESK) && searched ? 0.5 : 1 }}>
+                  return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg, opacity: (tile === T.SHELF || tile === T.DESK || tile === T.VENDING || tile === T.PLANT) && searched ? 0.5 : 1 }}>
                     {ts.img && TILE_IMG[ts.img] && <Sprite src={TILE_IMG[ts.img]} size={TILE_SIZE} />}
                   </div>;
                 })}
@@ -1254,7 +1267,7 @@ export default function MotherMoneyGame() {
                   if (ax < 0 || ax >= INT_COLS || ay < 0 || ay >= INT_ROWS) continue;
                   const adj = intMap[ay * INT_COLS + ax];
                   if (adj === T.COUNTER) return <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ でつかう</div>;
-                  if (adj === T.SHELF || adj === T.DESK) {
+                  if (adj === T.SHELF || adj === T.DESK || adj === T.VENDING || adj === T.PLANT) {
                     const key = `${interiorMode.townId}-${interiorMode.type}-${ax}-${ay}`;
                     if (!searchedItems.has(key)) return <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ でしらべる</div>;
                   }
