@@ -20,6 +20,7 @@ import {
 // ══════════════════════════════════════
 const CSS = `
 @import url('https://fonts.googleapis.com/css2?family=DotGothic16&display=swap');
+html,body{margin:0;padding:0;overflow:hidden;position:fixed;width:100%;height:100%;touch-action:none}
 .pixel{font-family:'DotGothic16',monospace}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 @keyframes shake{0%,100%{transform:translateX(0)}10%{transform:translateX(-3px)}20%{transform:translateX(3px)}30%{transform:translateX(-2px)}40%{transform:translateX(2px)}}
@@ -1112,7 +1113,7 @@ export default function MotherMoneyGame() {
   const townShopItems = ALL_SHOP_ITEMS.filter(i => town.shopItems.includes(i.id));
   const shopCats = [...new Set(townShopItems.map(i => i.cat))];
   const TILE_SIZE = 40;
-  const mapScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (COLS * TILE_SIZE), (window.innerHeight - 48) / (ROWS * TILE_SIZE)) : 1;
+  const mapScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (COLS * TILE_SIZE), window.innerHeight / (ROWS * TILE_SIZE)) : 1;
 
   // ══════════════════════════════════════
   //  RENDER
@@ -1144,11 +1145,11 @@ export default function MotherMoneyGame() {
   }
 
   return (
-    <div className="h-screen w-screen bg-gray-950 pixel text-white flex flex-col items-center justify-center overflow-hidden relative" style={{ imageRendering: 'pixelated', paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+    <div className="fixed inset-0 bg-gray-950 pixel text-white flex items-center justify-center overflow-hidden" style={{ imageRendering: 'pixelated' }}>
       <style>{CSS}</style>
 
       {/* HEADER (overlay) */}
-      <div className="absolute top-0 left-0 right-0 z-40 bg-gray-900/85 backdrop-blur-sm px-3 py-1.5 flex items-center justify-between">
+      <div className="fixed top-0 left-0 right-0 z-40 bg-gray-900/85 backdrop-blur-sm px-3 py-1.5 flex items-center justify-between" style={{ paddingTop: 'max(6px, env(safe-area-inset-top))' }}>
         <div className="flex items-center gap-2">
           <Coins size={14} className="text-yellow-400" />
           <span className="text-xs text-cyan-300">{town.name}</span>
@@ -1163,7 +1164,7 @@ export default function MotherMoneyGame() {
       </div>
 
       {currentNews && (
-        <div className={`absolute top-9 left-0 right-0 z-40 marquee-container text-xs py-0.5 px-2 ${currentNews.type === 'good' ? 'text-green-300 bg-green-950/70' : 'text-red-300 bg-red-950/70'}`}>
+        <div className={`fixed left-0 right-0 z-40 marquee-container text-xs py-0.5 px-2 ${currentNews.type === 'good' ? 'text-green-300 bg-green-950/70' : 'text-red-300 bg-red-950/70'}`} style={{ top: 'calc(36px + env(safe-area-inset-top))' }}>
           <span className="marquee-text">📰 {currentNews.text}</span>
         </div>
       )}
@@ -1238,7 +1239,7 @@ export default function MotherMoneyGame() {
           if (!intMap) return null;
           const intScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (INT_COLS * TILE_SIZE), window.innerHeight / (INT_ROWS * TILE_SIZE)) : 1;
           const bldgName = town.buildings.find(b => b.type === interiorMode.type)?.name || interiorMode.type;
-          return <div style={{ transform: `scale(${intScale})`, transformOrigin: 'top center' }}>
+          return <div style={{ transform: `scale(${intScale})`, transformOrigin: 'center center' }}>
             <div className="text-center text-cyan-300 text-xs pixel mb-1">{bldgName} のなか</div>
             <div className="relative bg-black" style={{ width: INT_COLS * TILE_SIZE, height: INT_ROWS * TILE_SIZE }}>
               <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${INT_COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${INT_ROWS}, ${TILE_SIZE}px)` }}>
@@ -1279,7 +1280,7 @@ export default function MotherMoneyGame() {
         })()
       ) : (
         /* Outdoor Map */
-        <div style={{ transform: `scale(${mapScale})`, transformOrigin: 'top center' }}>
+        <div style={{ transform: `scale(${mapScale})`, transformOrigin: 'center center' }}>
         <div className="relative bg-black" style={{ width: COLS * TILE_SIZE, height: ROWS * TILE_SIZE }}>
           <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${ROWS}, ${TILE_SIZE}px)` }}>
             {town.tiles.map((tile, i) => {
@@ -1320,7 +1321,7 @@ export default function MotherMoneyGame() {
 
       {/* GAMEBOY CONTROLS (overlay on map) */}
       {!activeBuilding && !papaCall && (
-        <div className="absolute bottom-6 left-0 right-0 z-30 flex items-end justify-between px-4 select-none pointer-events-none">
+        <div className="fixed left-0 right-0 z-30 flex items-end justify-between px-4 select-none pointer-events-none" style={{ bottom: 'max(16px, env(safe-area-inset-bottom))' }}>
           {/* D-PAD (left side) */}
           <div className="flex flex-col items-center gap-0 pointer-events-auto">
             <button className="w-12 h-12 bg-gray-800/80 border-2 border-gray-500/60 rounded-t-lg flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(0, -1)}><ChevronUp size={24} className="text-gray-200" /></button>
