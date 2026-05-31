@@ -296,6 +296,97 @@ function buildFlowerTile() {
   return rows;
 }
 
+// ── Interior tiles ──
+function buildFloorTile() {
+  const F='#c8a868',Fd='#b89858',Fl='#d8b878',Fll='#e0c888';
+  const rows = [];
+  for (let y = 0; y < 8; y++) {
+    const row = [];
+    for (let x = 0; x < 8; x++) {
+      // wooden plank pattern
+      if (y % 4 === 0) row.push(Fd);
+      else { const r = Math.random(); row.push(r < 0.2 ? Fll : r < 0.5 ? Fl : r < 0.8 ? F : Fd); }
+    }
+    rows.push(row);
+  }
+  return rows;
+}
+
+function buildWallTile() {
+  const W='#8a7a6a',Wd='#6a5a4a',Wl='#a09080',Wll='#b0a090';
+  return [
+    [Wd,Wd,Wd,Wd,Wd,Wd,Wd,Wd],
+    [W,W,Wl,W,W,Wl,W,W],
+    [W,Wl,Wll,Wl,W,Wll,Wl,W],
+    [W,W,Wl,W,W,Wl,W,W],
+    [Wd,Wd,Wd,Wd,Wd,Wd,Wd,Wd],
+    [Wl,W,W,Wl,Wl,W,W,Wl],
+    [Wll,Wl,W,Wll,Wll,Wl,W,Wll],
+    [Wl,W,W,Wl,Wl,W,W,Wl],
+  ];
+}
+
+function buildShelfSprite() {
+  const W='#7a5a2a',Wd='#5a3a1a',Wl='#9a7a4a';
+  const B1='#c04040',B2='#4060c0',B3='#40a050',B4='#d0a030';
+  return [
+    [Wd,W,W,W,W,W,W,Wd],
+    [W,B1,B2,B3,B4,B1,B2,W],
+    [W,B1,B2,B3,B4,B1,B2,W],
+    [Wd,Wl,Wl,Wl,Wl,Wl,Wl,Wd],
+    [W,B3,B4,B1,B2,B3,B4,W],
+    [W,B3,B4,B1,B2,B3,B4,W],
+    [Wd,Wl,Wl,Wl,Wl,Wl,Wl,Wd],
+    [Wd,Wd,Wd,Wd,Wd,Wd,Wd,Wd],
+  ];
+}
+
+function buildCounterSprite() {
+  const W='#a08868',Wd='#806848',Wl='#c0a888';
+  const T='#d0c0a0';
+  return [
+    [Wd,Wl,T,T,T,T,Wl,Wd],
+    [Wd,W,T,T,T,T,W,Wd],
+    [W,W,W,W,W,W,W,W],
+    [W,Wd,Wd,W,W,Wd,Wd,W],
+    [W,Wd,Wd,W,W,Wd,Wd,W],
+    [W,W,W,W,W,W,W,W],
+    [Wd,W,W,W,W,W,W,Wd],
+    [Wd,Wd,Wd,Wd,Wd,Wd,Wd,Wd],
+  ];
+}
+
+function buildDeskSprite() {
+  const W='#b09868',Wd='#907848',Wl='#d0b888';
+  const P='#f0e8d0';
+  return [
+    [Wd,Wl,Wl,Wl,Wl,Wl,Wl,Wd],
+    [W,P,P,P,P,P,P,W],
+    [W,W,W,W,W,W,W,W],
+    [W,Wd,_,_,_,_,Wd,W],
+    [W,Wd,_,_,_,_,Wd,W],
+    [W,Wd,_,_,_,_,Wd,W],
+    [W,W,_,_,_,_,W,W],
+    [Wd,Wd,_,_,_,_,Wd,Wd],
+  ];
+}
+
+function buildDoorSprite() {
+  const D='#9a7a4a',Dd='#7a5a2a',Dl='#ba9a6a';
+  const K='#e0c030';
+  const F='#c8a868';
+  return [
+    [Dd,Dd,Dd,Dd,Dd,Dd,Dd,Dd],
+    [Dd,D,D,Dl,Dl,D,D,Dd],
+    [Dd,D,D,Dl,Dl,D,D,Dd],
+    [Dd,D,D,D,D,D,D,Dd],
+    [Dd,D,D,D,K,D,D,Dd],
+    [Dd,D,D,D,D,D,D,Dd],
+    [Dd,D,D,Dl,Dl,D,D,Dd],
+    [F,F,F,F,F,F,F,F],
+  ];
+}
+
 // ── Buildings ──
 function buildHouse() {
   const O='#282830';
@@ -467,6 +558,14 @@ async function main() {
   await arrayToPng(buildRoadTile(), 'road', 10);
   await arrayToPng(buildSandTile(), 'sand', 10);
   await arrayToPng(buildFlowerTile(), 'flower', 10);
+
+  // Interior tiles
+  await arrayToPng(buildFloorTile(), 'floor', 10);
+  await arrayToPng(buildWallTile(), 'wall', 10);
+  await arrayToPng(buildShelfSprite(), 'shelf', 10);
+  await arrayToPng(buildCounterSprite(), 'counter', 10);
+  await arrayToPng(buildDeskSprite(), 'desk', 10);
+  await arrayToPng(buildDoorSprite(), 'door', 10);
 
   // Buildings
   await arrayToPng(buildHouse(), 'home', 8);

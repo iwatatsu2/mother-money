@@ -49,12 +49,13 @@ const PLAYER_IMG = { down: '/sprites/player_down.png', up: '/sprites/player_up.p
 const VEHICLE_IMG = { bike: '/sprites/bike.png', car: '/sprites/car.png', plane: '/sprites/plane.png', rocket: '/sprites/rocket.png' };
 const BLDG_IMG = { home: '/sprites/home.png', bank: '/sprites/bank.png', school: '/sprites/school.png', shop: '/sprites/shop.png', stock: '/sprites/stock.png', station: '/sprites/station.png' };
 const NPC_IMG = { warrior: '/sprites/npc_warrior.png', slime: '/sprites/npc_slime.png', witch: '/sprites/npc_witch.png' };
-const TILE_IMG = { grass: '/sprites/grass.png', path: '/sprites/path.png', water: '/sprites/water.png', tree: '/sprites/tree.png', flower: '/sprites/flower.png', fence: '/sprites/fence.png', road: '/sprites/road.png', sand: '/sprites/sand.png', stone: '/sprites/stone.png', dark: '/sprites/dark.png' };
+const TILE_IMG = { grass: '/sprites/grass.png', path: '/sprites/path.png', water: '/sprites/water.png', tree: '/sprites/tree.png', flower: '/sprites/flower.png', fence: '/sprites/fence.png', road: '/sprites/road.png', sand: '/sprites/sand.png', stone: '/sprites/stone.png', dark: '/sprites/dark.png', floor: '/sprites/floor.png', wall: '/sprites/wall.png', shelf: '/sprites/shelf.png', counter: '/sprites/counter.png', desk: '/sprites/desk.png', door: '/sprites/door.png' };
 
 // ══════════════════════════════════════
 //  Tile types & styles
 // ══════════════════════════════════════
-const T = { GRASS: 0, PATH: 1, WATER: 2, TREE: 3, FLOWER: 4, FENCE: 5, ROAD: 6, SAND: 7, STONE: 8, DARK: 9 };
+const T = { GRASS: 0, PATH: 1, WATER: 2, TREE: 3, FLOWER: 4, FENCE: 5, ROAD: 6, SAND: 7, STONE: 8, DARK: 9,
+  FLOOR: 10, WALL: 11, SHELF: 12, COUNTER: 13, DESK: 14, DOOR: 15 };
 const TILE_STYLE = {
   [T.GRASS]:  { bg: '#4a7c3f', img: 'grass' },
   [T.PATH]:   { bg: '#c4a96a', img: 'path' },
@@ -66,65 +67,212 @@ const TILE_STYLE = {
   [T.SAND]:   { bg: '#dcc27a', img: 'sand' },
   [T.STONE]:  { bg: '#888', img: 'stone' },
   [T.DARK]:   { bg: '#2a2a3e', img: 'dark' },
+  [T.FLOOR]:  { bg: '#c8a868', img: 'floor' },
+  [T.WALL]:   { bg: '#8a7a6a', img: 'wall' },
+  [T.SHELF]:  { bg: '#7a5a2a', img: 'shelf' },
+  [T.COUNTER]:{ bg: '#a08868', img: 'counter' },
+  [T.DESK]:   { bg: '#b09868', img: 'desk' },
+  [T.DOOR]:   { bg: '#9a7a4a', img: 'door' },
 };
-const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.DARK]);
+const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.DARK, T.FLOOR, T.DOOR]);
+
+// ══════════════════════════════════════
+//  Interior maps (10×8 each)
+// ══════════════════════════════════════
+const INT_COLS = 10, INT_ROWS = 8;
+const W = T.WALL, F = T.FLOOR, S = T.SHELF, C = T.COUNTER, D = T.DESK, DR = T.DOOR;
+const INTERIOR_MAPS = {
+  bank: [
+    W,W,W,W,W,W,W,W,W,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,C,C,C,C,C,C,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,W,W,W,DR,DR,W,W,W,W,
+  ],
+  school: [
+    W,W,W,W,W,W,W,W,W,W,
+    W,S,S,F,F,F,F,S,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,D,D,F,F,D,D,F,W,
+    W,F,D,D,F,F,D,D,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,F,C,C,F,F,F,W,
+    W,W,W,W,DR,DR,W,W,W,W,
+  ],
+  shop: [
+    W,W,W,W,W,W,W,W,W,W,
+    W,S,S,S,F,F,S,S,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,C,C,C,C,F,F,W,
+    W,W,W,W,DR,DR,W,W,W,W,
+  ],
+  stock: [
+    W,W,W,W,W,W,W,W,W,W,
+    W,D,D,F,F,F,F,D,D,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,C,C,C,C,F,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,W,W,W,DR,DR,W,W,W,W,
+  ],
+  home: [
+    W,W,W,W,W,W,W,W,W,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,D,F,F,F,F,D,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,W,W,W,DR,DR,W,W,W,W,
+  ],
+  station: [
+    W,W,W,W,W,W,W,W,W,W,
+    W,S,F,F,F,F,F,F,S,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,C,C,C,C,F,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,F,F,F,F,F,F,F,F,W,
+    W,W,W,W,DR,DR,W,W,W,W,
+  ],
+};
 
 // ══════════════════════════════════════
 //  Map builder
 // ══════════════════════════════════════
-const COLS = 16, ROWS = 12;
+const COLS = 16, ROWS = 24;
 const makeTiles = (base) => Array(ROWS * COLS).fill(base);
 const setRect = (t, x1, y1, x2, y2, v) => { const n = [...t]; for (let y = y1; y <= y2; y++) for (let x = x1; x <= x2; x++) n[y * COLS + x] = v; return n; };
+const setTile = (t, x, y, v) => { const n = [...t]; n[y * COLS + x] = v; return n; };
 
+// ═══ Town 0: はじまりのむら（丘と池のある村）═══
 const town0Tiles = (() => {
   let t = makeTiles(T.GRASS);
-  t = setRect(t, 0, 0, 15, 0, T.TREE); t = setRect(t, 0, 11, 15, 11, T.TREE);
-  t = setRect(t, 0, 0, 0, 11, T.TREE); t = setRect(t, 15, 0, 15, 11, T.TREE);
-  t[6 * COLS + 15] = T.PATH;
-  t = setRect(t, 7, 1, 7, 10, T.PATH); t = setRect(t, 1, 6, 14, 6, T.PATH);
-  t = setRect(t, 1, 1, 2, 1, T.FLOWER); t = setRect(t, 13, 1, 14, 1, T.FLOWER);
-  t = setRect(t, 1, 10, 2, 10, T.FLOWER); t = setRect(t, 13, 10, 14, 10, T.FLOWER);
-  t = setRect(t, 10, 5, 11, 5, T.FLOWER);
-  t = setRect(t, 5, 4, 6, 5, T.WATER);
+  // 不規則な木の境界（上）
+  t = setRect(t, 0, 0, 15, 0, T.TREE);
+  t = setRect(t, 0, 1, 2, 1, T.TREE); t = setRect(t, 13, 1, 15, 1, T.TREE);
+  // 左境界（凹凸）
+  t = setRect(t, 0, 0, 0, 23, T.TREE);
+  [3,4,8,9,15,16,20,21].forEach(y => { t[y * COLS + 1] = T.TREE; });
+  // 右境界（凹凸）
+  t = setRect(t, 15, 0, 15, 23, T.TREE);
+  [2,3,7,8,14,15,19,20].forEach(y => { t[y * COLS + 14] = T.TREE; });
+  // 下境界
+  t = setRect(t, 0, 23, 15, 23, T.TREE);
+  t = setRect(t, 0, 22, 3, 22, T.TREE); t = setRect(t, 12, 22, 15, 22, T.TREE);
+  // メインの十字路
+  t = setRect(t, 7, 2, 8, 21, T.PATH); // 縦の道
+  t = setRect(t, 2, 12, 13, 12, T.PATH); // 横の道
+  t = setRect(t, 2, 6, 6, 6, T.PATH); // 上の横道
+  t = setRect(t, 9, 6, 13, 6, T.PATH);
+  t = setRect(t, 2, 18, 6, 18, T.PATH); // 下の横道
+  t = setRect(t, 9, 18, 13, 18, T.PATH);
+  // 左上の池
+  t = setRect(t, 3, 3, 5, 5, T.WATER);
+  t[2 * COLS + 4] = T.WATER; t[6 * COLS + 4] = T.WATER;
+  // 右下の花畑の丘
+  t = setRect(t, 10, 19, 13, 21, T.FLOWER);
+  t[19 * COLS + 9] = T.FLOWER; t[21 * COLS + 9] = T.FLOWER;
+  // 散らばる花
+  t[4 * COLS + 10] = T.FLOWER; t[4 * COLS + 11] = T.FLOWER;
+  t[8 * COLS + 3] = T.FLOWER; t[16 * COLS + 3] = T.FLOWER;
+  // 木々（内部の飾り）
+  t[10 * COLS + 2] = T.TREE; t[10 * COLS + 13] = T.TREE;
+  t[15 * COLS + 5] = T.TREE; t[15 * COLS + 10] = T.TREE;
   return t;
 })();
 
+// ═══ Town 1: なかまちシティ（川が蛇行する街）═══
 const town1Tiles = (() => {
   let t = makeTiles(T.DARK);
-  t = setRect(t, 0, 0, 15, 0, T.FENCE); t = setRect(t, 0, 11, 15, 11, T.FENCE);
-  t = setRect(t, 0, 0, 0, 11, T.FENCE); t = setRect(t, 15, 0, 15, 11, T.FENCE);
-  t[6 * COLS + 0] = T.ROAD; t[6 * COLS + 15] = T.ROAD;
-  t = setRect(t, 1, 2, 14, 2, T.ROAD); t = setRect(t, 1, 6, 14, 6, T.ROAD); t = setRect(t, 1, 10, 14, 10, T.ROAD);
-  t = setRect(t, 2, 1, 2, 10, T.ROAD); t = setRect(t, 8, 1, 8, 10, T.ROAD); t = setRect(t, 14, 1, 14, 10, T.ROAD);
-  t = setRect(t, 1, 1, 14, 1, T.STONE); t = setRect(t, 1, 5, 14, 5, T.STONE);
-  t = setRect(t, 1, 7, 14, 7, T.STONE); t = setRect(t, 1, 9, 14, 9, T.STONE);
-  [1,5,7,9].forEach(r => [2,8,14].forEach(c => { t[r * COLS + c] = T.ROAD; }));
+  // 外周フェンス（不規則）
+  t = setRect(t, 0, 0, 15, 0, T.FENCE); t = setRect(t, 0, 23, 15, 23, T.FENCE);
+  t = setRect(t, 0, 0, 0, 23, T.FENCE); t = setRect(t, 15, 0, 15, 23, T.FENCE);
+  t[12 * COLS + 0] = T.ROAD; t[12 * COLS + 15] = T.ROAD;
+  // 道路グリッド
+  t = setRect(t, 1, 4, 14, 4, T.ROAD);
+  t = setRect(t, 1, 12, 14, 12, T.ROAD);
+  t = setRect(t, 1, 20, 14, 20, T.ROAD);
+  t = setRect(t, 3, 1, 3, 22, T.ROAD);
+  t = setRect(t, 8, 1, 8, 22, T.ROAD);
+  t = setRect(t, 13, 1, 13, 22, T.ROAD);
+  // 蛇行する川
+  t = setRect(t, 5, 1, 6, 3, T.WATER);
+  t = setRect(t, 6, 4, 7, 7, T.WATER);
+  t = setRect(t, 5, 8, 6, 11, T.WATER);
+  t = setRect(t, 6, 13, 7, 16, T.WATER);
+  t = setRect(t, 5, 17, 6, 19, T.WATER);
+  t = setRect(t, 6, 20, 7, 22, T.WATER);
+  // 橋（川を渡る道）
+  [4, 12, 20].forEach(r => { t[r * COLS + 5] = T.ROAD; t[r * COLS + 6] = T.ROAD; t[r * COLS + 7] = T.ROAD; });
+  // 歩道ブロック
+  t = setRect(t, 1, 1, 2, 3, T.STONE); t = setRect(t, 1, 5, 2, 11, T.STONE);
+  t = setRect(t, 9, 1, 12, 3, T.STONE); t = setRect(t, 9, 5, 12, 11, T.STONE);
+  t = setRect(t, 1, 13, 2, 19, T.STONE); t = setRect(t, 1, 21, 2, 22, T.STONE);
+  t = setRect(t, 9, 13, 12, 19, T.STONE); t = setRect(t, 9, 21, 12, 22, T.STONE);
+  t = setRect(t, 14, 1, 14, 22, T.STONE);
   return t;
 })();
 
+// ═══ Town 2: おおえどメトロ（右側に海岸線）═══
 const town2Tiles = (() => {
   let t = makeTiles(T.STONE);
-  t = setRect(t, 0, 0, 15, 0, T.FENCE); t = setRect(t, 0, 11, 15, 11, T.FENCE);
-  t = setRect(t, 0, 0, 0, 11, T.FENCE); t = setRect(t, 15, 0, 15, 11, T.FENCE);
-  t[6 * COLS + 0] = T.ROAD; t[6 * COLS + 15] = T.ROAD;
-  t = setRect(t, 1, 2, 14, 2, T.ROAD); t = setRect(t, 1, 5, 14, 5, T.ROAD);
-  t = setRect(t, 1, 6, 14, 6, T.ROAD); t = setRect(t, 1, 7, 14, 7, T.ROAD); t = setRect(t, 1, 10, 14, 10, T.ROAD);
-  t = setRect(t, 2, 1, 2, 10, T.ROAD); t = setRect(t, 6, 1, 6, 10, T.ROAD);
-  t = setRect(t, 10, 1, 10, 10, T.ROAD); t = setRect(t, 14, 1, 14, 10, T.ROAD);
+  // 外周
+  t = setRect(t, 0, 0, 15, 0, T.FENCE); t = setRect(t, 0, 23, 15, 23, T.FENCE);
+  t = setRect(t, 0, 0, 0, 23, T.FENCE);
+  // 右側海岸線（不規則）
+  t = setRect(t, 14, 0, 15, 23, T.WATER);
+  t = setRect(t, 13, 2, 13, 5, T.WATER);
+  t = setRect(t, 13, 10, 13, 14, T.WATER);
+  t = setRect(t, 13, 18, 13, 21, T.WATER);
+  t = setRect(t, 12, 3, 12, 4, T.SAND); // 砂浜
+  t = setRect(t, 12, 11, 12, 13, T.SAND);
+  t = setRect(t, 12, 19, 12, 20, T.SAND);
+  t[12 * COLS + 0] = T.ROAD;
+  // 大通り
+  t = setRect(t, 1, 4, 11, 4, T.ROAD); t = setRect(t, 1, 5, 11, 5, T.ROAD);
+  t = setRect(t, 1, 12, 11, 12, T.ROAD); t = setRect(t, 1, 13, 11, 13, T.ROAD);
+  t = setRect(t, 1, 20, 11, 20, T.ROAD);
+  t = setRect(t, 3, 1, 3, 22, T.ROAD);
+  t = setRect(t, 7, 1, 7, 22, T.ROAD);
+  t = setRect(t, 11, 1, 11, 22, T.ROAD);
   return t;
 })();
 
+// ═══ Town 3: せかいとし（オアシス都市）═══
 const town3Tiles = (() => {
   let t = makeTiles(T.SAND);
-  t = setRect(t, 15, 0, 15, 11, T.WATER); t = setRect(t, 0, 0, 15, 0, T.WATER);
-  t = setRect(t, 0, 11, 15, 11, T.WATER); t = setRect(t, 14, 0, 14, 11, T.WATER);
-  t[6 * COLS + 0] = T.ROAD;
-  t = setRect(t, 0, 6, 13, 6, T.ROAD);
-  t = setRect(t, 7, 1, 7, 10, T.ROAD); t = setRect(t, 2, 1, 2, 10, T.ROAD); t = setRect(t, 12, 1, 12, 10, T.ROAD);
-  t = setRect(t, 5, 4, 9, 4, T.PATH); t = setRect(t, 5, 8, 9, 8, T.PATH);
-  t = setRect(t, 3, 1, 6, 1, T.PATH); t = setRect(t, 8, 1, 11, 1, T.PATH);
-  t[2 * COLS + 5] = T.FLOWER; t[2 * COLS + 9] = T.FLOWER;
-  t[9 * COLS + 5] = T.FLOWER; t[9 * COLS + 9] = T.FLOWER;
+  // 周囲を木→砂のグラデーション
+  t = setRect(t, 0, 0, 15, 1, T.TREE); t = setRect(t, 0, 22, 15, 23, T.TREE);
+  t = setRect(t, 0, 0, 1, 23, T.TREE); t = setRect(t, 14, 0, 15, 23, T.TREE);
+  // 内側は砂（一部木が突出）
+  [5,6,17,18].forEach(y => { t[y * COLS + 2] = T.TREE; });
+  [4,5,18,19].forEach(y => { t[y * COLS + 13] = T.TREE; });
+  t[12 * COLS + 1] = T.ROAD; // 入口
+  // 中央オアシス（大きな池）
+  t = setRect(t, 6, 10, 9, 14, T.WATER);
+  t[9 * COLS + 7] = T.WATER; t[9 * COLS + 8] = T.WATER;
+  t[15 * COLS + 7] = T.WATER; t[15 * COLS + 8] = T.WATER;
+  // オアシス周囲に花
+  t[9 * COLS + 6] = T.FLOWER; t[9 * COLS + 9] = T.FLOWER;
+  t[15 * COLS + 6] = T.FLOWER; t[15 * COLS + 9] = T.FLOWER;
+  t[10 * COLS + 5] = T.FLOWER; t[14 * COLS + 5] = T.FLOWER;
+  t[10 * COLS + 10] = T.FLOWER; t[14 * COLS + 10] = T.FLOWER;
+  // 道路
+  t = setRect(t, 3, 6, 12, 6, T.ROAD);
+  t = setRect(t, 3, 18, 12, 18, T.ROAD);
+  t = setRect(t, 7, 2, 8, 21, T.ROAD);
+  t = setRect(t, 3, 3, 6, 3, T.PATH); t = setRect(t, 9, 3, 12, 3, T.PATH);
+  t = setRect(t, 3, 21, 6, 21, T.PATH); t = setRect(t, 9, 21, 12, 21, T.PATH);
+  t = setRect(t, 4, 2, 4, 5, T.ROAD); t = setRect(t, 11, 2, 11, 5, T.ROAD);
+  t = setRect(t, 4, 15, 4, 21, T.ROAD); t = setRect(t, 11, 15, 11, 21, T.ROAD);
   return t;
 })();
 
@@ -157,70 +305,70 @@ const NPC_TIPS = {
 const TOWNS = [
   { id: 0, name: 'はじまりのむら', desc: 'のどかなむら。おかねのきほんをまなぼう！', tiles: town0Tiles, color: '#4a7c3f',
     buildings: [
-      { type: 'home', x: 3, y: 2, emoji: '🏠', name: 'じぶんのいえ' },
-      { type: 'bank', x: 7, y: 2, emoji: '🏦', name: 'ぎんこう' },
-      { type: 'school', x: 12, y: 2, emoji: '🏫', name: 'がっこう' },
-      { type: 'shop', x: 3, y: 8, emoji: '🛒', name: 'ショップ' },
-      { type: 'stock', x: 7, y: 8, emoji: '📈', name: 'しょうけん' },
-      { type: 'station', x: 12, y: 8, emoji: '🚉', name: 'えき' },
+      { type: 'home', x: 3, y: 4, emoji: '🏠', name: 'じぶんのいえ' },
+      { type: 'bank', x: 10, y: 4, emoji: '🏦', name: 'ぎんこう' },
+      { type: 'school', x: 3, y: 10, emoji: '🏫', name: 'がっこう' },
+      { type: 'shop', x: 10, y: 10, emoji: '🛒', name: 'ショップ' },
+      { type: 'stock', x: 3, y: 16, emoji: '📈', name: 'しょうけん' },
+      { type: 'station', x: 10, y: 16, emoji: '🚉', name: 'えき' },
     ],
     npcs: [
-      { type: 'warrior', x: 5, y: 5, name: 'センシくん' },
-      { type: 'slime', x: 10, y: 5, name: 'ぷるお' },
+      { type: 'warrior', x: 5, y: 8, name: 'センシくん' },
+      { type: 'slime', x: 10, y: 14, name: 'ぷるお' },
     ],
-    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'bank_s'],
+    startPos: { x: 7, y: 12 }, stocks: ['candy', 'fish', 'pet', 'bank_s'],
     shopItems: ['toy1', 'toy2', 'toy3', 'toy4', 'food1', 'food2', 'int6', 'car1'],
     rewardMult: 1, unlockReq: null,
   },
   { id: 1, name: 'なかまちシティ', desc: 'にぎやかな町。ちゅうきゅうかぶがかえる！', tiles: town1Tiles, color: '#3a5fa0',
     buildings: [
-      { type: 'bank', x: 4, y: 3, emoji: '🏦', name: 'なかまちぎんこう' },
-      { type: 'school', x: 7, y: 3, emoji: '🏫', name: 'なかまち学園' },
-      { type: 'stock', x: 11, y: 3, emoji: '📈', name: 'シティしょうけん' },
-      { type: 'shop', x: 4, y: 8, emoji: '🛒', name: 'シティモール' },
-      { type: 'home', x: 7, y: 8, emoji: '🏠', name: 'マンション' },
-      { type: 'station', x: 11, y: 8, emoji: '🚉', name: 'シティえき' },
+      { type: 'bank', x: 5, y: 2, emoji: '🏦', name: 'なかまちぎんこう' },
+      { type: 'school', x: 10, y: 2, emoji: '🏫', name: 'なかまち学園' },
+      { type: 'stock', x: 10, y: 8, emoji: '📈', name: 'シティしょうけん' },
+      { type: 'shop', x: 5, y: 15, emoji: '🛒', name: 'シティモール' },
+      { type: 'home', x: 10, y: 15, emoji: '🏠', name: 'マンション' },
+      { type: 'station', x: 5, y: 21, emoji: '🚉', name: 'シティえき' },
     ],
     npcs: [
-      { type: 'slime', x: 9, y: 6, name: 'ぷるみ' },
-      { type: 'witch', x: 5, y: 6, name: 'マジカ' },
+      { type: 'slime', x: 10, y: 12, name: 'ぷるみ' },
+      { type: 'witch', x: 5, y: 8, name: 'マジカ' },
     ],
-    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'bank_s', 'insure', 'energy'],
+    startPos: { x: 8, y: 12 }, stocks: ['candy', 'fish', 'pet', 'game', 'bank_s', 'insure', 'energy'],
     shopItems: ['toy1', 'toy2', 'toy3', 'food1', 'food2', 'int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2'],
     rewardMult: 2, unlockReq: { asset: 3000, vehicle: 'bike' },
   },
   { id: 2, name: 'おおえどメトロ', desc: 'だいとかい！こうがくなとうしができる！', tiles: town2Tiles, color: '#8a3fa0',
     buildings: [
-      { type: 'bank', x: 4, y: 3, emoji: '🏦', name: 'メガバンク' },
-      { type: 'stock', x: 8, y: 3, emoji: '📈', name: 'おおえどしょうけん' },
-      { type: 'school', x: 4, y: 8, emoji: '🏫', name: 'おおえど大学' },
-      { type: 'shop', x: 8, y: 8, emoji: '🛒', name: 'ひゃっかてん' },
-      { type: 'home', x: 12, y: 3, emoji: '🏠', name: 'タワマン' },
-      { type: 'station', x: 12, y: 8, emoji: '🚉', name: 'メトロえき' },
+      { type: 'bank', x: 5, y: 2, emoji: '🏦', name: 'メガバンク' },
+      { type: 'stock', x: 9, y: 2, emoji: '📈', name: 'おおえどしょうけん' },
+      { type: 'school', x: 5, y: 8, emoji: '🏫', name: 'おおえど大学' },
+      { type: 'shop', x: 9, y: 8, emoji: '🛒', name: 'ひゃっかてん' },
+      { type: 'home', x: 5, y: 16, emoji: '🏠', name: 'タワマン' },
+      { type: 'station', x: 9, y: 16, emoji: '🚉', name: 'メトロえき' },
     ],
     npcs: [
-      { type: 'warrior', x: 6, y: 6, name: 'ナイト' },
-      { type: 'witch', x: 10, y: 6, name: 'ウィズ' },
+      { type: 'warrior', x: 5, y: 12, name: 'ナイト' },
+      { type: 'witch', x: 9, y: 12, name: 'ウィズ' },
     ],
-    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'energy', 'resort'],
+    startPos: { x: 7, y: 12 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'energy', 'resort'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'house1', 'house2', 'land1'],
     rewardMult: 3, unlockReq: { asset: 15000, vehicle: 'car' },
   },
   { id: 3, name: 'せかいとし', desc: 'せかいのちゅうしん！ゆめのとうしができる！', tiles: town3Tiles, color: '#c4a020',
     buildings: [
-      { type: 'bank', x: 4, y: 3, emoji: '🏦', name: 'ワールドバンク' },
-      { type: 'stock', x: 10, y: 3, emoji: '📈', name: 'ワールドしょうけん' },
-      { type: 'home', x: 7, y: 5, emoji: '🏠', name: 'ペントハウス' },
-      { type: 'school', x: 4, y: 8, emoji: '🏫', name: 'せかい大学' },
-      { type: 'shop', x: 10, y: 8, emoji: '🛒', name: 'せかいマーケット' },
-      { type: 'station', x: 13, y: 6, emoji: '🚉', name: 'くうこう' },
+      { type: 'bank', x: 5, y: 4, emoji: '🏦', name: 'ワールドバンク' },
+      { type: 'stock', x: 10, y: 4, emoji: '📈', name: 'ワールドしょうけん' },
+      { type: 'home', x: 5, y: 8, emoji: '🏠', name: 'ペントハウス' },
+      { type: 'school', x: 5, y: 16, emoji: '🏫', name: 'せかい大学' },
+      { type: 'shop', x: 10, y: 16, emoji: '🛒', name: 'せかいマーケット' },
+      { type: 'station', x: 10, y: 20, emoji: '🚉', name: 'くうこう' },
     ],
     npcs: [
-      { type: 'warrior', x: 7, y: 3, name: 'マスター' },
-      { type: 'slime', x: 7, y: 8, name: 'キングぷる' },
-      { type: 'witch', x: 2, y: 6, name: 'アーク' },
+      { type: 'warrior', x: 8, y: 6, name: 'マスター' },
+      { type: 'slime', x: 5, y: 20, name: 'キングぷる' },
+      { type: 'witch', x: 10, y: 8, name: 'アーク' },
     ],
-    startPos: { x: 7, y: 6 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'space', 'energy', 'resort', 'crypto'],
+    startPos: { x: 7, y: 12 }, stocks: ['candy', 'fish', 'pet', 'game', 'robo', 'ai', 'bank_s', 'insure', 'space', 'energy', 'resort', 'crypto'],
     shopItems: ['int1', 'int2', 'int3', 'int4', 'int5', 'int6', 'car1', 'car2', 'car3', 'car4', 'house1', 'house2', 'house3', 'land1', 'land2', 'land3'],
     rewardMult: 5, unlockReq: { asset: 50000, vehicle: 'plane' },
   },
@@ -480,6 +628,9 @@ export default function MotherMoneyGame() {
   const [sectorFilter, setSectorFilter] = useState('all');
   // NPC
   const [npcDialog, setNpcDialog] = useState(null); // { name, type, tip }
+  const [interiorMode, setInteriorMode] = useState(null); // { type, townId }
+  const [interiorPos, setInteriorPos] = useState({ x: 4, y: 6 });
+  const [searchedItems, setSearchedItems] = useState(new Set()); // "townId-type-x-y"
 
   // Derived
   const town = TOWNS[currentTown];
@@ -504,16 +655,70 @@ export default function MotherMoneyGame() {
     if (activeBuilding || papaCall) return;
     setFacing(dx > 0 ? 'right' : dx < 0 ? 'left' : dy > 0 ? 'down' : 'up');
     setIsWalking(true); setTimeout(() => setIsWalking(false), 200);
+
+    // Interior movement
+    if (interiorMode) {
+      const nx = interiorPos.x + dx, ny = interiorPos.y + dy;
+      if (nx < 0 || nx >= INT_COLS || ny < 0 || ny >= INT_ROWS) return;
+      const intMap = INTERIOR_MAPS[interiorMode.type];
+      if (!intMap) return;
+      const tile = intMap[ny * INT_COLS + nx];
+      if (tile === T.FLOOR || tile === T.DOOR) setInteriorPos({ x: nx, y: ny });
+      return;
+    }
+
     const nx = playerPos.x + dx, ny = playerPos.y + dy;
     if (nx < 0 || nx >= COLS || ny < 0 || ny >= ROWS) return;
     const bldg = town.buildings.find(b => b.x === nx && b.y === ny);
     const npc = town.npcs?.find(n => n.x === nx && n.y === ny);
     if (bldg || npc || WALKABLE.has(town.tiles[ny * COLS + nx])) setPlayerPos({ x: nx, y: ny });
-  }, [activeBuilding, papaCall, playerPos, town]);
+  }, [activeBuilding, papaCall, playerPos, town, interiorMode, interiorPos]);
 
   const handleInteract = useCallback(() => {
     if (activeBuilding) return;
     if (npcDialog) { setNpcDialog(null); return; }
+
+    // Interior interaction
+    if (interiorMode) {
+      const intMap = INTERIOR_MAPS[interiorMode.type];
+      if (!intMap) return;
+      const tile = intMap[interiorPos.y * INT_COLS + interiorPos.x];
+      // Door → exit
+      if (tile === T.DOOR) {
+        setInteriorMode(null);
+        return;
+      }
+      // Check adjacent tiles for shelf/desk/counter
+      const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+      for (const [ddx, ddy] of dirs) {
+        const ax = interiorPos.x + ddx, ay = interiorPos.y + ddy;
+        if (ax < 0 || ax >= INT_COLS || ay < 0 || ay >= INT_ROWS) continue;
+        const adjTile = intMap[ay * INT_COLS + ax];
+        if (adjTile === T.COUNTER) {
+          // Open building UI
+          setActiveBuilding(interiorMode.type);
+          setSelectedStock(null); setBuyQty(1); setQuizResult(null);
+          setMiniGame(null); setMiniGameResult(null); setPlacingItem(null);
+          setHomeTab('status'); setShopCat('おもちゃ');
+          return;
+        }
+        if (adjTile === T.SHELF || adjTile === T.DESK) {
+          const key = `${interiorMode.townId}-${interiorMode.type}-${ax}-${ay}`;
+          if (searchedItems.has(key)) {
+            notify('もうしらべたよ！');
+            return;
+          }
+          const coin = Math.floor(Math.random() * 46) + 5; // 5-50 MM
+          setWallet(w => w + coin);
+          setTotalEarned(te => te + coin);
+          setSearchedItems(prev => new Set([...prev, key]));
+          notify(`${coin} MM みつけた！`, 'success');
+          return;
+        }
+      }
+      return;
+    }
+
     const npc = town.npcs?.find(n => n.x === playerPos.x && n.y === playerPos.y);
     if (npc) {
       const tips = NPC_TIPS[npc.type] || [];
@@ -523,17 +728,18 @@ export default function MotherMoneyGame() {
     }
     const bldg = town.buildings.find(b => b.x === playerPos.x && b.y === playerPos.y);
     if (bldg) {
-      setActiveBuilding(bldg.type);
-      setSelectedStock(null); setBuyQty(1); setQuizResult(null);
-      setMiniGame(null); setMiniGameResult(null); setPlacingItem(null);
-      setHomeTab('status'); setShopCat('おもちゃ');
+      // Enter building interior
+      setInteriorMode({ type: bldg.type, townId: currentTown });
+      setInteriorPos({ x: 4, y: 6 }); // near door
+      setFacing('up');
     }
-  }, [activeBuilding, npcDialog, town, playerPos]);
+  }, [activeBuilding, npcDialog, town, playerPos, interiorMode, interiorPos, searchedItems, currentTown, notify]);
 
   // Keyboard
   useEffect(() => {
     const h = (e) => {
       if (activeBuilding || papaCall) { if (e.key === 'Escape') { setActiveBuilding(null); } return; }
+      if (e.key === 'Escape' && interiorMode) { setInteriorMode(null); return; }
       switch (e.key) {
         case 'ArrowUp': case 'w': case 'W': movePlayer(0, -1); e.preventDefault(); break;
         case 'ArrowDown': case 's': case 'S': movePlayer(0, 1); e.preventDefault(); break;
@@ -544,7 +750,7 @@ export default function MotherMoneyGame() {
     };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
-  }, [movePlayer, activeBuilding, papaCall, handleInteract]);
+  }, [movePlayer, activeBuilding, papaCall, handleInteract, interiorMode]);
 
   // Market tick (景気サイクル + セクター連動 + 大型イベント + 指値約定)
   useEffect(() => {
@@ -893,7 +1099,7 @@ export default function MotherMoneyGame() {
   const townShopItems = ALL_SHOP_ITEMS.filter(i => town.shopItems.includes(i.id));
   const shopCats = [...new Set(townShopItems.map(i => i.cat))];
   const TILE_SIZE = 40;
-  const mapScale = typeof window !== 'undefined' ? Math.min(1, (window.innerWidth - 16) / (COLS * 40)) : 1;
+  const mapScale = typeof window !== 'undefined' ? Math.min(1, (window.innerWidth - 16) / (COLS * TILE_SIZE), (window.innerHeight - 160) / (ROWS * TILE_SIZE)) : 1;
 
   // ══════════════════════════════════════
   //  RENDER
@@ -1012,43 +1218,92 @@ export default function MotherMoneyGame() {
       )}
 
       {/* MAP */}
-      <div style={{ transform: `scale(${mapScale})`, transformOrigin: 'top center' }}>
-      <div className="relative mt-1 border-4 border-cyan-400/60 bg-black" style={{ width: COLS * TILE_SIZE, height: ROWS * TILE_SIZE }}>
-        <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${ROWS}, ${TILE_SIZE}px)` }}>
-          {town.tiles.map((tile, i) => {
-            const ts = TILE_STYLE[tile];
-            return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg }}>
-              {ts.img && TILE_IMG[ts.img] && <Sprite src={TILE_IMG[ts.img]} size={TILE_SIZE} />}
+      {interiorMode ? (
+        /* Interior Map */
+        (() => {
+          const intMap = INTERIOR_MAPS[interiorMode.type];
+          if (!intMap) return null;
+          const intScale = typeof window !== 'undefined' ? Math.min(1, (window.innerWidth - 16) / (INT_COLS * TILE_SIZE), (window.innerHeight - 160) / (INT_ROWS * TILE_SIZE)) : 1;
+          const bldgName = town.buildings.find(b => b.type === interiorMode.type)?.name || interiorMode.type;
+          return <div style={{ transform: `scale(${intScale})`, transformOrigin: 'top center' }}>
+            <div className="text-center text-cyan-300 text-xs pixel mb-1">{bldgName} のなか</div>
+            <div className="relative border-4 border-yellow-400/60 bg-black" style={{ width: INT_COLS * TILE_SIZE, height: INT_ROWS * TILE_SIZE }}>
+              <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${INT_COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${INT_ROWS}, ${TILE_SIZE}px)` }}>
+                {intMap.map((tile, i) => {
+                  const ts = TILE_STYLE[tile];
+                  const x = i % INT_COLS, y = Math.floor(i / INT_COLS);
+                  const key = `${interiorMode.townId}-${interiorMode.type}-${x}-${y}`;
+                  const searched = searchedItems.has(key);
+                  return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg, opacity: (tile === T.SHELF || tile === T.DESK) && searched ? 0.5 : 1 }}>
+                    {ts.img && TILE_IMG[ts.img] && <Sprite src={TILE_IMG[ts.img]} size={TILE_SIZE} />}
+                  </div>;
+                })}
+              </div>
+              <div className="absolute flex items-end justify-center transition-all duration-150 ease-out" style={{ left: interiorPos.x * TILE_SIZE - TILE_SIZE * 0.15, top: interiorPos.y * TILE_SIZE - TILE_SIZE * 0.3, width: TILE_SIZE * 1.3, height: TILE_SIZE * 1.3, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
+                <Sprite src={PLAYER_IMG[facing] || PLAYER_IMG.down} size={TILE_SIZE * 1.3} />
+              </div>
+              {/* Hint: on door tile */}
+              {intMap[interiorPos.y * INT_COLS + interiorPos.x] === T.DOOR && (
+                <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ でそとへ</div>
+              )}
+              {/* Hint: adjacent to shelf/desk/counter */}
+              {(() => {
+                const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+                for (const [ddx, ddy] of dirs) {
+                  const ax = interiorPos.x + ddx, ay = interiorPos.y + ddy;
+                  if (ax < 0 || ax >= INT_COLS || ay < 0 || ay >= INT_ROWS) continue;
+                  const adj = intMap[ay * INT_COLS + ax];
+                  if (adj === T.COUNTER) return <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ でつかう</div>;
+                  if (adj === T.SHELF || adj === T.DESK) {
+                    const key = `${interiorMode.townId}-${interiorMode.type}-${ax}-${ay}`;
+                    if (!searchedItems.has(key)) return <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ でしらべる</div>;
+                  }
+                }
+                return null;
+              })()}
+            </div>
+          </div>;
+        })()
+      ) : (
+        /* Outdoor Map */
+        <div style={{ transform: `scale(${mapScale})`, transformOrigin: 'top center' }}>
+        <div className="relative mt-1 border-4 border-cyan-400/60 bg-black" style={{ width: COLS * TILE_SIZE, height: ROWS * TILE_SIZE }}>
+          <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${ROWS}, ${TILE_SIZE}px)` }}>
+            {town.tiles.map((tile, i) => {
+              const ts = TILE_STYLE[tile];
+              return <div key={i} className="flex items-center justify-center select-none" style={{ backgroundColor: ts.bg }}>
+                {ts.img && TILE_IMG[ts.img] && <Sprite src={TILE_IMG[ts.img]} size={TILE_SIZE} />}
+              </div>;
+            })}
+          </div>
+          {town.buildings.map((b, i) => {
+            const bSize = TILE_SIZE * 1.8;
+            const bOffset = (bSize - TILE_SIZE) / 2;
+            return <div key={i} className="absolute flex items-end justify-center" style={{ left: b.x * TILE_SIZE - bOffset, top: b.y * TILE_SIZE - (bSize - TILE_SIZE), width: bSize, height: bSize, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
+              {BLDG_IMG[b.type] ? <Sprite src={BLDG_IMG[b.type]} size={bSize} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
             </div>;
           })}
+          {(town.npcs || []).map((npc, i) => {
+            const nSize = TILE_SIZE * 1.4;
+            return <div key={'npc'+i} className="absolute flex items-end justify-center" style={{ left: npc.x * TILE_SIZE - (nSize - TILE_SIZE) / 2, top: npc.y * TILE_SIZE - (nSize - TILE_SIZE) * 0.8, width: nSize, height: nSize, zIndex: 15, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.6))', animation: 'float 2s ease-in-out infinite' }}>
+              {NPC_IMG[npc.type] && <Sprite src={NPC_IMG[npc.type]} size={nSize} />}
+            </div>;
+          })}
+          <div className="absolute flex items-end justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE - TILE_SIZE * 0.15, top: playerPos.y * TILE_SIZE - TILE_SIZE * 0.3, width: TILE_SIZE * 1.3, height: TILE_SIZE * 1.3, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
+            {(() => {
+              const src = vehicle ? VEHICLE_IMG[vehicle] : PLAYER_IMG[facing] || PLAYER_IMG.down;
+              return <Sprite src={src} size={TILE_SIZE * 1.3} />;
+            })()}
+          </div>
+          {town.npcs?.some(n => n.x === playerPos.x && n.y === playerPos.y) && !npcDialog && !activeBuilding && (
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ ではなす</div>
+          )}
+          {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
+            <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ で入る</div>
+          )}
         </div>
-        {town.buildings.map((b, i) => {
-          const bSize = TILE_SIZE * 1.8;
-          const bOffset = (bSize - TILE_SIZE) / 2;
-          return <div key={i} className="absolute flex items-end justify-center" style={{ left: b.x * TILE_SIZE - bOffset, top: b.y * TILE_SIZE - (bSize - TILE_SIZE), width: bSize, height: bSize, zIndex: 10, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.7))', animation: playerPos.x === b.x && playerPos.y === b.y ? 'float 1s ease-in-out infinite' : 'none' }}>
-            {BLDG_IMG[b.type] ? <Sprite src={BLDG_IMG[b.type]} size={bSize} /> : <span style={{ fontSize: '20px' }}>{b.emoji}</span>}
-          </div>;
-        })}
-        {(town.npcs || []).map((npc, i) => {
-          const nSize = TILE_SIZE * 1.4;
-          return <div key={'npc'+i} className="absolute flex items-end justify-center" style={{ left: npc.x * TILE_SIZE - (nSize - TILE_SIZE) / 2, top: npc.y * TILE_SIZE - (nSize - TILE_SIZE) * 0.8, width: nSize, height: nSize, zIndex: 15, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.6))', animation: 'float 2s ease-in-out infinite' }}>
-            {NPC_IMG[npc.type] && <Sprite src={NPC_IMG[npc.type]} size={nSize} />}
-          </div>;
-        })}
-        <div className="absolute flex items-end justify-center transition-all duration-150 ease-out" style={{ left: playerPos.x * TILE_SIZE - TILE_SIZE * 0.15, top: playerPos.y * TILE_SIZE - TILE_SIZE * 0.3, width: TILE_SIZE * 1.3, height: TILE_SIZE * 1.3, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
-          {(() => {
-            const src = vehicle ? VEHICLE_IMG[vehicle] : PLAYER_IMG[facing] || PLAYER_IMG.down;
-            return <Sprite src={src} size={TILE_SIZE * 1.3} />;
-          })()}
         </div>
-        {town.npcs?.some(n => n.x === playerPos.x && n.y === playerPos.y) && !npcDialog && !activeBuilding && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ ではなす</div>
-        )}
-        {town.buildings.some(b => b.x === playerPos.x && b.y === playerPos.y) && !activeBuilding && (
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-cyan-300 text-[10px] px-2 py-0.5 border border-cyan-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Enter / Ⓐ で入る</div>
-        )}
-      </div>
-      </div>
+      )}
 
       {/* D-PAD */}
       <div className="mt-2 flex flex-col items-center gap-0.5 select-none">
