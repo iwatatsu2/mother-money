@@ -1099,7 +1099,7 @@ export default function MotherMoneyGame() {
   const townShopItems = ALL_SHOP_ITEMS.filter(i => town.shopItems.includes(i.id));
   const shopCats = [...new Set(townShopItems.map(i => i.cat))];
   const TILE_SIZE = 40;
-  const mapScale = typeof window !== 'undefined' ? Math.min(1, (window.innerWidth - 16) / (COLS * TILE_SIZE), (window.innerHeight - 160) / (ROWS * TILE_SIZE)) : 1;
+  const mapScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (COLS * TILE_SIZE), window.innerHeight / (ROWS * TILE_SIZE)) : 1;
 
   // ══════════════════════════════════════
   //  RENDER
@@ -1131,11 +1131,11 @@ export default function MotherMoneyGame() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 pixel text-white flex flex-col items-center" style={{ imageRendering: 'pixelated' }}>
+    <div className="h-screen w-screen bg-gray-950 pixel text-white flex flex-col items-center justify-center overflow-hidden relative" style={{ imageRendering: 'pixelated' }}>
       <style>{CSS}</style>
 
-      {/* HEADER */}
-      <div className="w-full max-w-lg bg-gray-900 border-b-2 border-cyan-400/50 px-3 py-1.5 flex items-center justify-between">
+      {/* HEADER (overlay) */}
+      <div className="absolute top-0 left-0 right-0 z-40 bg-gray-900/85 backdrop-blur-sm px-3 py-1.5 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Coins size={14} className="text-yellow-400" />
           <span className="text-xs text-cyan-300">{town.name}</span>
@@ -1150,7 +1150,7 @@ export default function MotherMoneyGame() {
       </div>
 
       {currentNews && (
-        <div className={`w-full max-w-lg marquee-container text-xs py-0.5 px-2 ${currentNews.type === 'good' ? 'text-green-300 bg-green-950/50' : 'text-red-300 bg-red-950/50'}`}>
+        <div className={`absolute top-9 left-0 right-0 z-40 marquee-container text-xs py-0.5 px-2 ${currentNews.type === 'good' ? 'text-green-300 bg-green-950/70' : 'text-red-300 bg-red-950/70'}`}>
           <span className="marquee-text">📰 {currentNews.text}</span>
         </div>
       )}
@@ -1223,11 +1223,11 @@ export default function MotherMoneyGame() {
         (() => {
           const intMap = INTERIOR_MAPS[interiorMode.type];
           if (!intMap) return null;
-          const intScale = typeof window !== 'undefined' ? Math.min(1, (window.innerWidth - 16) / (INT_COLS * TILE_SIZE), (window.innerHeight - 160) / (INT_ROWS * TILE_SIZE)) : 1;
+          const intScale = typeof window !== 'undefined' ? Math.min(1, window.innerWidth / (INT_COLS * TILE_SIZE), window.innerHeight / (INT_ROWS * TILE_SIZE)) : 1;
           const bldgName = town.buildings.find(b => b.type === interiorMode.type)?.name || interiorMode.type;
           return <div style={{ transform: `scale(${intScale})`, transformOrigin: 'top center' }}>
             <div className="text-center text-cyan-300 text-xs pixel mb-1">{bldgName} のなか</div>
-            <div className="relative border-4 border-yellow-400/60 bg-black" style={{ width: INT_COLS * TILE_SIZE, height: INT_ROWS * TILE_SIZE }}>
+            <div className="relative bg-black" style={{ width: INT_COLS * TILE_SIZE, height: INT_ROWS * TILE_SIZE }}>
               <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${INT_COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${INT_ROWS}, ${TILE_SIZE}px)` }}>
                 {intMap.map((tile, i) => {
                   const ts = TILE_STYLE[tile];
@@ -1267,7 +1267,7 @@ export default function MotherMoneyGame() {
       ) : (
         /* Outdoor Map */
         <div style={{ transform: `scale(${mapScale})`, transformOrigin: 'top center' }}>
-        <div className="relative mt-1 border-4 border-cyan-400/60 bg-black" style={{ width: COLS * TILE_SIZE, height: ROWS * TILE_SIZE }}>
+        <div className="relative bg-black" style={{ width: COLS * TILE_SIZE, height: ROWS * TILE_SIZE }}>
           <div className="absolute inset-0 grid" style={{ gridTemplateColumns: `repeat(${COLS}, ${TILE_SIZE}px)`, gridTemplateRows: `repeat(${ROWS}, ${TILE_SIZE}px)` }}>
             {town.tiles.map((tile, i) => {
               const ts = TILE_STYLE[tile];
@@ -1305,18 +1305,25 @@ export default function MotherMoneyGame() {
         </div>
       )}
 
-      {/* D-PAD */}
-      <div className="mt-2 flex flex-col items-center gap-0.5 select-none">
-        <button className="w-11 h-11 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(0, -1)}><ChevronUp size={22} className="text-gray-300" /></button>
-        <div className="flex gap-0.5">
-          <button className="w-11 h-11 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(-1, 0)}><ChevronLeft size={22} className="text-gray-300" /></button>
-          <button className="w-11 h-11 bg-yellow-800 border-2 border-yellow-500 rounded flex items-center justify-center active:bg-yellow-600 cursor-pointer text-sm text-yellow-200 pixel" onPointerDown={handleInteract}>Ⓐ</button>
-          <button className="w-11 h-11 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(1, 0)}><ChevronRight size={22} className="text-gray-300" /></button>
+      {/* GAMEBOY CONTROLS (overlay on map) */}
+      {!activeBuilding && !papaCall && (
+        <div className="absolute bottom-6 left-0 right-0 z-30 flex items-end justify-between px-4 select-none pointer-events-none">
+          {/* D-PAD (left side) */}
+          <div className="flex flex-col items-center gap-0 pointer-events-auto">
+            <button className="w-12 h-12 bg-gray-800/80 border-2 border-gray-500/60 rounded-t-lg flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(0, -1)}><ChevronUp size={24} className="text-gray-200" /></button>
+            <div className="flex gap-0">
+              <button className="w-12 h-12 bg-gray-800/80 border-2 border-gray-500/60 rounded-l-lg flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(-1, 0)}><ChevronLeft size={24} className="text-gray-200" /></button>
+              <div className="w-12 h-12 bg-gray-700/60 border-2 border-gray-500/40 flex items-center justify-center"><div className="w-3 h-3 rounded-full bg-gray-500/50" /></div>
+              <button className="w-12 h-12 bg-gray-800/80 border-2 border-gray-500/60 rounded-r-lg flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(1, 0)}><ChevronRight size={24} className="text-gray-200" /></button>
+            </div>
+            <button className="w-12 h-12 bg-gray-800/80 border-2 border-gray-500/60 rounded-b-lg flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(0, 1)}><ChevronDown size={24} className="text-gray-200" /></button>
+          </div>
+          {/* A BUTTON (right side) */}
+          <div className="pointer-events-auto mb-2">
+            <button className="w-16 h-16 bg-red-700/80 border-3 border-red-400/70 rounded-full flex items-center justify-center active:bg-red-500 cursor-pointer text-lg text-white pixel shadow-lg" style={{ boxShadow: '0 4px 8px rgba(0,0,0,0.5), inset 0 1px 2px rgba(255,255,255,0.2)' }} onPointerDown={handleInteract}>A</button>
+          </div>
         </div>
-        <button className="w-11 h-11 bg-gray-800 border-2 border-gray-600 rounded flex items-center justify-center active:bg-gray-600 cursor-pointer" onPointerDown={() => movePlayer(0, 1)}><ChevronDown size={22} className="text-gray-300" /></button>
-      </div>
-
-      {(() => { const b = town.buildings.find(b => b.x === playerPos.x && b.y === playerPos.y); return b && !activeBuilding ? <div className="text-xs text-cyan-300 mt-1">{b.emoji} {b.name}</div> : null; })()}
+      )}
 
       {/* BUILDING MODAL */}
       {activeBuilding && (
