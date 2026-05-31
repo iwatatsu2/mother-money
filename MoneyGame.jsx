@@ -85,6 +85,17 @@ const WALKABLE = new Set([T.GRASS, T.PATH, T.ROAD, T.SAND, T.FLOWER, T.STONE, T.
 // ══════════════════════════════════════
 const INT_COLS = 10, INT_ROWS = 8;
 const iW = T.WALL, iF = T.FLOOR, iS = T.SHELF, iC = T.COUNTER, iD = T.DESK, iDR = T.DOOR, iP = T.PLANT, iV = T.VENDING, iR = T.RUG;
+
+// Interior NPCs: each building has an NPC behind the counter
+const INTERIOR_NPCS = {
+  bank:    { x: 5, y: 2, type: 'warrior', name: 'てんいん', greet: 'いらっしゃいませ！\nおかねをあずけますか？' },
+  school:  { x: 5, y: 1, type: 'witch',   name: 'せんせい', greet: 'きょうもべんきょうしよう！\nクイズにちょうせんする？' },
+  shop:    { x: 4, y: 5, type: 'slime',   name: 'てんちょう', greet: 'いらっしゃい！\nなにをおさがし？' },
+  stock:   { x: 5, y: 4, type: 'warrior', name: 'ブローカー', greet: 'かぶのとりひき、\nやってみる？' },
+  home:    { x: 5, y: 3, type: 'slime',   name: 'ペット', greet: 'おかえり〜！\nおへやをみる？' },
+  station: { x: 5, y: 3, type: 'witch',   name: 'えきいん', greet: 'つぎのまちへいきますか？' },
+};
+
 const INTERIOR_MAPS = {
   // 銀行: カウンター奥に金庫棚、ロビーに観葉植物、ATMコーナー
   bank: [
@@ -672,8 +683,10 @@ export default function MotherMoneyGame() {
       if (nx < 0 || nx >= INT_COLS || ny < 0 || ny >= INT_ROWS) return;
       const intMap = INTERIOR_MAPS[interiorMode.type];
       if (!intMap) return;
+      const intNpc = INTERIOR_NPCS[interiorMode.type];
+      if (intNpc && intNpc.x === nx && intNpc.y === ny) return; // can't walk into NPC
       const tile = intMap[ny * INT_COLS + nx];
-      if (tile === T.FLOOR || tile === T.DOOR) setInteriorPos({ x: nx, y: ny });
+      if (tile === T.FLOOR || tile === T.DOOR || tile === T.RUG) setInteriorPos({ x: nx, y: ny });
       return;
     }
 
@@ -686,7 +699,18 @@ export default function MotherMoneyGame() {
 
   const handleInteract = useCallback(() => {
     if (activeBuilding) return;
-    if (npcDialog) { setNpcDialog(null); return; }
+    if (npcDialog) {
+      if (npcDialog.action) {
+        setNpcDialog(null);
+        setActiveBuilding(npcDialog.action);
+        setSelectedStock(null); setBuyQty(1); setQuizResult(null);
+        setMiniGame(null); setMiniGameResult(null); setPlacingItem(null);
+        setHomeTab('status'); setShopCat('おもちゃ');
+      } else {
+        setNpcDialog(null);
+      }
+      return;
+    }
 
     // Interior interaction
     if (interiorMode) {
@@ -698,22 +722,25 @@ export default function MotherMoneyGame() {
         setInteriorMode(null);
         return;
       }
-      // Check adjacent tiles for door/shelf/desk/counter
+      // Check adjacent tiles
       const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+      const intNpc = INTERIOR_NPCS[interiorMode.type];
       for (const [ddx, ddy] of dirs) {
         const ax = interiorPos.x + ddx, ay = interiorPos.y + ddy;
         if (ax < 0 || ax >= INT_COLS || ay < 0 || ay >= INT_ROWS) continue;
+        // NPC → show dialog then open building UI
+        if (intNpc && intNpc.x === ax && intNpc.y === ay) {
+          setNpcDialog({
+            name: intNpc.name,
+            type: intNpc.type,
+            tip: intNpc.greet,
+            action: interiorMode.type, // building type to open on close
+          });
+          return;
+        }
         const adjTile = intMap[ay * INT_COLS + ax];
         if (adjTile === T.DOOR) {
           setInteriorMode(null);
-          return;
-        }
-        if (adjTile === T.COUNTER) {
-          // Open building UI
-          setActiveBuilding(interiorMode.type);
-          setSelectedStock(null); setBuyQty(1); setQuizResult(null);
-          setMiniGame(null); setMiniGameResult(null); setPlacingItem(null);
-          setHomeTab('status'); setShopCat('おもちゃ');
           return;
         }
         if (adjTile === T.SHELF || adjTile === T.DESK || adjTile === T.VENDING || adjTile === T.PLANT) {
@@ -1200,11 +1227,21 @@ export default function MotherMoneyGame() {
               {NPC_IMG[npcDialog.type] && <img src={NPC_IMG[npcDialog.type]} className="w-12 h-12" style={{ imageRendering: 'pixelated', objectFit: 'contain' }} />}
               <div className="flex-1">
                 <div className="text-yellow-300 text-xs font-bold mb-1">{npcDialog.name}</div>
-                <div className="text-white text-xs leading-relaxed">{npcDialog.tip}</div>
+                <div className="text-white text-xs leading-relaxed whitespace-pre-line">{npcDialog.tip}</div>
               </div>
             </div>
-            <div className="text-center mt-3">
-              <button className="text-[10px] text-gray-400 border border-gray-600 px-3 py-1 cursor-pointer hover:bg-gray-800" onClick={() => setNpcDialog(null)}>とじる</button>
+            <div className="flex justify-center gap-2 mt-3">
+              {npcDialog.action && (
+                <button className="text-[10px] text-cyan-300 border border-cyan-400 px-3 py-1 cursor-pointer hover:bg-cyan-950" onClick={() => {
+                  const act = npcDialog.action;
+                  setNpcDialog(null);
+                  setActiveBuilding(act);
+                  setSelectedStock(null); setBuyQty(1); setQuizResult(null);
+                  setMiniGame(null); setMiniGameResult(null); setPlacingItem(null);
+                  setHomeTab('status'); setShopCat('おもちゃ');
+                }}>はい</button>
+              )}
+              <button className="text-[10px] text-gray-400 border border-gray-600 px-3 py-1 cursor-pointer hover:bg-gray-800" onClick={() => setNpcDialog(null)}>{npcDialog.action ? 'いいえ' : 'とじる'}</button>
             </div>
           </div>
         </div>
@@ -1253,9 +1290,31 @@ export default function MotherMoneyGame() {
                   </div>;
                 })}
               </div>
+              {/* Interior NPC */}
+              {(() => {
+                const intNpc = INTERIOR_NPCS[interiorMode.type];
+                if (!intNpc) return null;
+                const nSize = TILE_SIZE * 1.3;
+                return <div className="absolute flex items-end justify-center" style={{ left: intNpc.x * TILE_SIZE - (nSize - TILE_SIZE) / 2, top: intNpc.y * TILE_SIZE - (nSize - TILE_SIZE) * 0.8, width: nSize, height: nSize, zIndex: 15, filter: 'drop-shadow(1px 2px 2px rgba(0,0,0,0.6))', animation: 'float 2s ease-in-out infinite' }}>
+                  {NPC_IMG[intNpc.type] && <Sprite src={NPC_IMG[intNpc.type]} size={nSize} />}
+                </div>;
+              })()}
+              {/* Player */}
               <div className="absolute flex items-end justify-center transition-all duration-150 ease-out" style={{ left: interiorPos.x * TILE_SIZE - TILE_SIZE * 0.15, top: interiorPos.y * TILE_SIZE - TILE_SIZE * 0.3, width: TILE_SIZE * 1.3, height: TILE_SIZE * 1.3, zIndex: 20, animation: isWalking ? 'walk 0.2s ease-in-out' : 'none', filter: 'drop-shadow(0 2px 3px rgba(0,0,0,0.8))' }}>
                 <Sprite src={PLAYER_IMG[facing] || PLAYER_IMG.down} size={TILE_SIZE * 1.3} />
               </div>
+              {/* Hint: adjacent to NPC */}
+              {(() => {
+                const intNpc = INTERIOR_NPCS[interiorMode.type];
+                if (!intNpc) return null;
+                const dirs = [[0,-1],[0,1],[-1,0],[1,0]];
+                for (const [ddx, ddy] of dirs) {
+                  if (interiorPos.x + ddx === intNpc.x && interiorPos.y + ddy === intNpc.y) {
+                    return <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ ではなす</div>;
+                  }
+                }
+                return null;
+              })()}
               {/* Hint: on door tile */}
               {intMap[interiorPos.y * INT_COLS + interiorPos.x] === T.DOOR && (
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 bg-black/80 text-yellow-300 text-[10px] px-2 py-0.5 border border-yellow-400/50 z-30" style={{ animation: 'blink 1.5s infinite' }}>Ⓐ でそとへ</div>
